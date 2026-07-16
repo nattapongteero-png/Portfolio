@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #fafafa;
+  color: #000;
+  font-family: 'Google Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+/* Hide scrollbars but keep scroll functionality (feed-like snapping) */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Dynamic viewport height for mobile browsers (iOS Safari address bar) */
+.h-dvh {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
