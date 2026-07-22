@@ -39,3 +39,29 @@ body {
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
 }
+
+/* The section nav sits above the feed in its own stacking context, so it would
+   paint over the device while a prototype is focused — most visibly on narrow
+   screens, where the focused phone fills the viewport. FeedSection flags the
+   state on <body>; the menu simply steps aside. */
+/* Only narrow screens need this: there the focused device fills the viewport,
+   so the menu would sit right on top of the app. Wider screens keep the menu
+   visible and show a "MyAtlas / Prototype" breadcrumb instead. */
+@media (max-width: 767px) {
+  body[data-proto-focused='1'] .nav-menu {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+.nav-menu {
+  transition: opacity 350ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The page shell: one centred column every surface positions against, so the
+   layout stops hugging the left edge on wide screens and the profile title
+   still lands on the same rect as the feed's nav title. */
+.page-shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1600px;
+}

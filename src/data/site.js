@@ -5,7 +5,8 @@
 // The shared isometric illustration is the asset exported from the Figma file.
 // -----------------------------------------------------------------------------
 
-export const SHARED_IMAGE = '/room.png'
+// BASE_URL-aware so assets resolve under GitHub Pages' /Portfolio/ base too.
+export const SHARED_IMAGE = `${import.meta.env.BASE_URL}room.png`
 
 export const nav = [
   { id: 'hero', label: 'Home' },
@@ -16,7 +17,7 @@ export const nav = [
 
 // Personal avatar shown on the hero + contact screens. Drop a real photo at
 // /public/me.jpg (or change this path); until then it falls back to the initial.
-export const AVATAR = '/me.jpg'
+export const AVATAR = `${import.meta.env.BASE_URL}me.jpg`
 
 export const hero = {
   id: 'hero',

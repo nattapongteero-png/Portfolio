@@ -1,38 +1,29 @@
 // -----------------------------------------------------------------------------
 // NavMenu.jsx
-// The top-left navigation menu (replaces the horizontal tab bar). It shows a
-// sliding window of only three menu items around the focused section:
-//
-//     previous · [ FOCUSED ] · next
-//
-//   • First section  → focused + the next two items (no "previous").
-//   • Last section   → the previous two items + focused (no "next").
-//   • Otherwise      → previous · focused · next.
-//
-// The focused item expands in place to reveal the big title + description (and
-// hashtags). When the description overflows two lines a "ดูเพิ่มเติม" toggle
-// appears; expanding drops a faint dark scrim over the illustration and flips
-// the text to light so the copy becomes the focus — TikTok-style.
+// The top-left navigation menu: a sliding window of three items around the
+// focused section — previous · [ FOCUSED ] · next. Titles only; descriptions
+// and hashtags live in the section content itself. The focused title renders
+// big; neighbours are muted, tappable labels. Items drift vertically with the
+// scroll position (same axis as the page) and cross-fade.
 // -----------------------------------------------------------------------------
 
-import { useRef, useState, useLayoutEffect, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// Cylindrical "wheel picker" transform for a menu item, keyed off its distance
-// from the focused item (offset). Above the center tilts its top away, below
-// tilts its bottom away — like the drum of an iOS date picker / a hamster wheel.
+// Flat vertical transform — items slide up/down on the SAME axis as the page
+// scroll (no 3D tilt), so the menu moves in lockstep with scrolling. `offset`
+// is the item's fractional distance from the focused section.
+const SLOT = 16 // px parallax per slot (on top of the flex layout)
 function wheelTransform(offset) {
   const dist = Math.abs(offset)
   return {
-    rotateX: -offset * 28,        // deg — sign flips above vs. below center
-    translateZ: -dist * 42,       // px  — focus pops toward the viewer
-    y: offset * 6,                // px  — tighten spacing swallowed by rotation
-    opacity: Math.max(0, 1 - dist * 0.4),
+    y: offset * SLOT,                          // subtle vertical drift with scroll
+    opacity: Math.max(0, 1 - dist * 0.62),     // neighbours fade back
+    scale: 1 - Math.min(dist, 1) * 0.1,        // slight depth for the focus
   }
 }
 
-// Enter/leave from the *next* seat on the wheel so items slide continuously
-// along the drum instead of popping in — the "drag" feel.
+// Enter/leave from one slot further out so items flow in vertically.
 function wheelEdge(offset) {
   const step = offset === 0 ? 1 : Math.sign(offset)
   return { ...wheelTransform(offset + step), opacity: 0 }
@@ -40,6 +31,11 @@ function wheelEdge(offset) {
 
 // Slide, don't spring — no overshoot means no bounce.
 const wheelTween = { type: 'tween', ease: [0.22, 1, 0.36, 1], duration: 0.5 }
+
+// The breadcrumb rides the SAME curve and length as the device's focus move
+// (easeInOutQuad over ~1s), so the two read as one gesture instead of two
+// animations glancing off each other.
+const CRUMB_TWEEN = { type: 'tween', ease: [0.45, 0, 0.55, 1], duration: 0.95 }
 
 // Which three (or fewer) indices to render around the active one.
 function windowAround(active, n) {
@@ -49,101 +45,51 @@ function windowAround(active, n) {
   return [active - 1, active, active + 1]
 }
 
-export default function NavMenu({ sections, activeIndex, position = activeIndex, onNavigate }) {
-  const descRef = useRef(null)     // live collapsed <p> — read-only (width/line-height)
-  const measureRef = useRef(null)  // hidden twin — safe to mutate for measuring
-  const [expanded, setExpanded] = useState(false)
-  // { text: string shown when collapsed, over: was it truncated }
-  const [clamp, setClamp] = useState({ text: null, over: false })
-
-  // Which section is "big" follows the scroll — it flips at the halfway point
-  // (round) so the focused content slides + swaps continuously (TikTok style).
-  const focusIndex = Math.max(0, Math.min(sections.length - 1, Math.round(position)))
-  const indices = windowAround(focusIndex, sections.length)
-  const activeSection = sections[focusIndex]
-  const fullDesc = activeSection?.lines?.[1]
-
-  // Collapse the caption whenever the focused section changes.
+// `compact` renders the same menu (same window, same drift/spring animation) at
+// the smaller scale a detail page needs under its own page title.
+export default function NavMenu({
+  sections,
+  activeIndex,
+  position = activeIndex,
+  onNavigate,
+  compact = false,
+  positionClass = 'left-4 top-6 md:left-[120px] md:top-12',
+  // When set, the focused title shrinks and this label follows it as a
+  // breadcrumb — "MyAtlas / Prototype" — so the page you came from stays on
+  // screen instead of vanishing.
+  breadcrumb = null,
+  // Called when the (now muted) section title is tapped while a breadcrumb is
+  // showing — the standard "go up a level" affordance.
+  onBreadcrumbBack = null,
+}) {
+  // Which section is "big" follows the scroll, but with hysteresis: it only
+  // flips once the scroll is >0.6 past the current section. A plain round()
+  // flips at exactly .5, which jitters while the eased scroll settles.
+  const [focusIndex, setFocusIndex] = useState(() =>
+    Math.max(0, Math.min(sections.length - 1, Math.round(position)))
+  )
   useEffect(() => {
-    setExpanded(false)
-  }, [focusIndex])
+    setFocusIndex((cur) => {
+      if (position > cur + 0.6) return Math.min(sections.length - 1, cur + 1)
+      if (position < cur - 0.6) return Math.max(0, cur - 1)
+      return cur
+    })
+  }, [position, sections.length])
 
-  // Truncate the collapsed description to exactly two lines, leaving room for
-  // the inline "…ดูเพิ่มเติม" toggle. Measured with real layout (binary search)
-  // so nothing overlaps or spills a third line.
-  useLayoutEffect(() => {
-    const live = descRef.current
-    const m = measureRef.current
-    if (expanded || !live || !m || !fullDesc) return
-
-    const compute = () => {
-      m.style.width = `${live.clientWidth}px`
-      const lh = parseFloat(getComputedStyle(live).lineHeight)
-      const maxH = lh * 2 + 1
-      const reserve = '… ดูเพิ่มเติม'
-      m.textContent = fullDesc
-      if (m.scrollHeight <= maxH) {
-        setClamp({ text: fullDesc, over: false })
-        return
-      }
-      let lo = 0, hi = fullDesc.length, best = 0
-      while (lo <= hi) {
-        const mid = (lo + hi) >> 1
-        m.textContent = fullDesc.slice(0, mid).trimEnd() + reserve
-        if (m.scrollHeight <= maxH) { best = mid; lo = mid + 1 } else hi = mid - 1
-      }
-      setClamp({ text: fullDesc.slice(0, best).trimEnd(), over: true })
-    }
-
-    compute()
-    window.addEventListener('resize', compute)
-    return () => window.removeEventListener('resize', compute)
-  }, [focusIndex, expanded, fullDesc])
-
-  const showToggle = clamp.over
-  const descClass = 'text-sm leading-[1.5] md:text-xl'
-
-  // While scrolling, the illustration slides up through the title. Wash the top
-  // with the page bg so the text stays readable — strong mid-scroll, gone at rest.
-  const scrimStrength = Math.min(Math.abs(position - Math.round(position)) * 3, 1)
+  const indices = windowAround(focusIndex, sections.length)
 
   return (
-    <>
-      {/* Hidden twin used only to measure where to truncate the description */}
-      <p
-        ref={measureRef}
-        aria-hidden
-        className={`pointer-events-none invisible fixed left-0 top-0 -z-10 ${descClass}`}
-      />
-
-      {/* Top readability wash — keeps the title legible while the illustration
-          scrolls up past it. Ramps with scroll, invisible at rest. */}
-      {!expanded && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 z-[15] h-[45vh]"
-          style={{
-            opacity: scrimStrength,
-            background: 'linear-gradient(to bottom, #fafafa 55%, rgba(250,250,250,0) 100%)',
-          }}
-        />
-      )}
-
-      {/* Dark scrim — fades in when the caption is expanded (focus mode) */}
-      <button
-        aria-hidden={!expanded}
-        tabIndex={-1}
-        onClick={() => setExpanded(false)}
-        className={`fixed inset-0 z-[15] bg-black/45 backdrop-blur-[2px] transition-opacity duration-300 ${
-          expanded ? 'opacity-100' : 'pointer-events-none opacity-0'
-        }`}
-      />
-
-      {/* Windowed menu, top-left — rendered on a 3D cylinder (wheel picker).
-          Drag vertically to spin through sections. */}
+    <div
+      className={`nav-menu pointer-events-none absolute z-[16] flex max-w-[82%] cursor-grab touch-none flex-col active:cursor-grabbing md:max-w-[620px] ${
+        compact ? 'gap-2 md:gap-2' : 'gap-2 md:gap-3'
+      } ${positionClass}`}
+    >
       <motion.div
-        className="pointer-events-auto absolute left-4 top-6 z-[16] flex max-w-[82%] cursor-grab touch-none flex-col gap-3 active:cursor-grabbing md:left-[120px] md:top-12 md:max-w-[620px] md:gap-5"
-        style={{ perspective: 1000, transformStyle: 'preserve-3d' }}
+        // `items-start`, not the default stretch: otherwise every row is as wide
+        // as the widest one, and since neighbours are scaled about their centre
+        // they visibly slide sideways whenever the active row's width changes
+        // (e.g. when the breadcrumb appears).
+        className={`flex flex-col items-start ${compact ? 'gap-2 md:gap-2' : 'gap-2 md:gap-3'}`}
         drag="y"
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={0.18}
@@ -157,110 +103,98 @@ export default function NavMenu({ sections, activeIndex, position = activeIndex,
         }}
       >
         <AnimatePresence initial={false} mode="popLayout">
-        {indices.map((idx) => {
-          const s = sections[idx]
-          const isActive = idx === focusIndex
-          const offset = idx - focusIndex             // discrete — enter/exit direction
-          const liveOffset = idx - position           // fractional — tracks scroll
+          {indices.map((idx) => {
+            const s = sections[idx]
+            const isActive = idx === focusIndex
+            const offset = idx - focusIndex   // discrete — enter/exit direction
+            const liveOffset = idx - position // fractional — tracks scroll
+            // With a breadcrumb the title is a level you can climb back to.
+            // It stays an <h2> either way: swapping the element type would
+            // remount it, and the size transition would snap instead of easing.
+            const canGoBack = isActive && breadcrumb && onBreadcrumbBack
 
-          // Inactive menu item — muted, tappable label. Wheel tracks scroll 1:1.
-          if (!isActive) {
             return (
-              <motion.button
+              <motion.div
                 key={s.domId}
-                onClick={() => onNavigate(idx)}
-                style={{ transformOrigin: 'center', transformPerspective: 1000 }}
                 initial={wheelEdge(offset)}
                 animate={wheelTransform(liveOffset)}
                 exit={{ ...wheelEdge(offset), transition: wheelTween }}
-                transition={{ type: 'spring', stiffness: 700, damping: 50 }}
-                className={`pointer-events-auto text-left text-lg font-medium transition-colors md:text-2xl ${
-                  expanded ? 'text-white/50 hover:text-white' : 'text-neutral-400 hover:text-neutral-700'
-                }`}
+                transition={{ type: 'spring', stiffness: 520, damping: 72 }}
+                className="pointer-events-auto"
               >
-                {s.title}
-              </motion.button>
-            )
-          }
-
-          // Focused item — big title + description + hashtags. Slides with scroll.
-          return (
-            <motion.div
-              key={s.domId}
-              style={{ transformOrigin: 'center', transformPerspective: 1000 }}
-              initial={wheelEdge(offset)}
-              animate={wheelTransform(liveOffset)}
-              exit={{ ...wheelEdge(offset), transition: wheelTween }}
-              transition={{ type: 'spring', stiffness: 700, damping: 50 }}
-              className={`pointer-events-auto ${
-                expanded ? 'no-scrollbar max-h-[60vh] overflow-y-auto pr-2' : ''
-              }`}
-            >
-              <h2
-                className={`text-3xl font-bold leading-none tracking-tight transition-colors sm:text-5xl md:text-7xl ${
-                  expanded ? 'text-white' : 'text-black'
-                }`}
-              >
-                {s.title}
-              </h2>
-
-              <div className="mt-3 space-y-1.5 md:mt-5 md:space-y-2">
-                {s.lines?.[1] && (
-                  expanded ? (
-                    <p className="text-sm leading-[1.5] text-neutral-100 md:text-xl">
-                      {s.lines[1]}
-                      {showToggle && (
-                        <button
-                          onClick={() => setExpanded(false)}
-                          className="ml-1 text-sm font-semibold text-white/80 transition hover:text-white md:text-base"
-                        >
-                          ย่อ
-                        </button>
-                      )}
-                    </p>
-                  ) : (
-                    // Collapsed: JS-truncated to two lines with the toggle inline.
-                    <p ref={descRef} className={`${descClass} text-neutral-500`}>
-                      {clamp.text ?? s.lines[1]}
-                      {clamp.over && (
-                        <>
-                          {'… '}
-                          <button
-                            onClick={() => setExpanded(true)}
-                            className="text-sm font-semibold text-neutral-500 transition hover:text-neutral-800 md:text-base"
+                {!isActive ? (
+                  <button
+                    onClick={() => onNavigate(idx)}
+                    className={`text-left font-medium text-[#9c988e] transition-colors hover:text-[#33332f] md:text-2xl ${
+                      compact ? 'text-xl' : 'text-lg'
+                    }`}
+                  >
+                    {s.title}
+                  </button>
+                ) : (
+                  <>
+                    {/* Never wraps: mid-transition the title is growing back to
+                        full size while the crumb is still on screen, and a wrap
+                        would double the row height and shove the menu below it
+                        down. Overflow is harmless — the menu is decorative and
+                        the device paints over it. */}
+                    <div className="flex flex-nowrap items-baseline gap-x-3 whitespace-nowrap">
+                      <h2
+                        {...(canGoBack
+                          ? {
+                              onClick: onBreadcrumbBack,
+                              role: 'button',
+                              tabIndex: 0,
+                              onKeyDown: (e) =>
+                                (e.key === 'Enter' || e.key === ' ') && onBreadcrumbBack(),
+                            }
+                          : {})}
+                        // With a breadcrumb the section title steps back — it
+                        // is where you came FROM — and the crumb takes over the
+                        // full size and weight the title had.
+                        className={`font-bold leading-none tracking-tight transition-all duration-[950ms] ease-[cubic-bezier(0.45,0,0.55,1)] ${
+                          compact
+                            ? 'text-3xl text-[#21221f] md:text-4xl'
+                            : breadcrumb
+                              ? 'cursor-pointer text-2xl text-[#9c988e] hover:text-[#4e4e4e] sm:text-3xl md:text-4xl'
+                              : 'text-3xl text-[#21221f] sm:text-5xl md:text-7xl'
+                        }`}
+                      >
+                        {s.title}
+                      </h2>
+                      <AnimatePresence>
+                        {breadcrumb && (
+                          <motion.div
+                            key="crumb"
+                            // Scales as well as fades, mirroring the title's
+                            // font-size move: 0.5 -> 1 is the same 36px -> 72px
+                            // range MyAtlas travels, so the two halves of the
+                            // breadcrumb grow and shrink as one.
+                            initial={{ opacity: 0, x: -8, scale: 0.5 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: -8, scale: 0.5 }}
+                            transition={CRUMB_TWEEN}
+                            style={{ transformOrigin: 'left center' }}
+                            className="flex flex-nowrap items-baseline gap-x-3"
                           >
-                            ดูเพิ่มเติม
-                          </button>
-                        </>
-                      )}
-                    </p>
-                  )
+                            <span className="text-2xl font-light text-[#c4beb3] sm:text-3xl md:text-4xl">
+                              /
+                            </span>
+                            <span className="text-3xl font-bold leading-none tracking-tight text-[#21221f] sm:text-5xl md:text-7xl">
+                              {breadcrumb}
+                            </span>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    {s.footer}
+                  </>
                 )}
-              </div>
-
-              {/* Hashtags — always visible */}
-              {s.tags?.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {s.tags.map((t) => (
-                    <span
-                      key={t}
-                      className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors md:text-sm ${
-                        expanded
-                          ? 'border-white/25 bg-white/10 text-white'
-                          : 'border-neutral-200 bg-white text-neutral-600'
-                      }`}
-                    >
-                      #{t}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {s.footer}
-            </motion.div>
-          )
-        })}
+              </motion.div>
+            )
+          })}
         </AnimatePresence>
       </motion.div>
-    </>
+    </div>
   )
 }

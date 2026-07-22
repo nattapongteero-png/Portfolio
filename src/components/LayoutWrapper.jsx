@@ -1,19 +1,20 @@
 // -----------------------------------------------------------------------------
 // LayoutWrapper.jsx
-// One responsive full-viewport shell. The Figma mobile and web layouts are the
-// same structure at different breakpoints, so a single <VerticalFeed /> covers
-// both — it renders the compact mobile design below md and the spacious web
-// design at md and up. `wheelSnap` gives desktops one-section-per-scroll.
+// One responsive full-viewport shell: the vertical feed, plus the full-screen
+// project profile (ProjectDetail) overlaid when a project avatar is tapped.
 // -----------------------------------------------------------------------------
 
+import { AnimatePresence } from 'framer-motion'
 import VerticalFeed from './VerticalFeed'
+import ProjectDetail from './ProjectDetail'
+import { usePortfolio, VIEW } from '../context/PortfolioContext'
 
 export default function LayoutWrapper() {
-  // Let desktop use the same native snap-scroll as mobile so the wheel/fade
-  // track scroll continuously instead of jumping one section per wheel tick.
+  const { view } = usePortfolio()
   return (
     <div className="h-dvh w-full bg-[#fafafa]">
-      <VerticalFeed wheelSnap={false} />
+      <VerticalFeed />
+      <AnimatePresence>{view === VIEW.DETAIL && <ProjectDetail key="detail" />}</AnimatePresence>
     </div>
   )
 }

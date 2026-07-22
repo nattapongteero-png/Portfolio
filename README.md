@@ -30,6 +30,52 @@ npm run deploy   # build + publish dist/ to gh-pages branch
 
 > ทุกครั้งที่อัปเดต/push ให้บันทึกรายละเอียดการแก้ไขไว้ที่นี่ (ใหม่สุดอยู่บน).
 
+### 2026-07-22 — Design System pages, project reel, 8px spacing rule
+
+**Design System detail pages (`FeedSheet.jsx`)** — three data-driven specimen panels. Every
+number shown is read out of the MyAtlas source or measured off the running prototype; none of
+it is illustrative.
+- **Color** — `ColorSpecimen`. Brand card + tokens grouped by role (brand / surface / text /
+  border / semantic / category). Contrast is computed live (WCAG 2.1 relative luminance)
+  against the surface each token actually sits on, with AA / AA-large / fail badges. Palette
+  taken from the app's `AppColors` + hex literals compiled into the build, confirmed by
+  sampling pixels off the live prototype (`#1D8B6B` brand green).
+- **Typography** — `TypeSpecimen`. Set in the real face (IBM Plex Sans Thai Looped, confirmed
+  by watching the prototype's font requests — the deployed build does *not* use DM Sans).
+  Shows the four shipped weights drawn at their own weight, x-height/cap measured off the TTF,
+  and a `Ratio` column for the step multiplier.
+- **Grid & Layout** — `GridSpecimen`. Three real captures of the prototype (Home / Health /
+  Profile) with a layout-inspector overlay drawn in the screen's own 390×844 coordinate space.
+  Gutters, card sizes, gaps and corner radii were all read back off those captures by pixel
+  analysis (radii by circle-fitting the corner against the card's fill).
+
+**Project detail restructure (`ProjectDetail.jsx`)**
+- Sections with headings; a tab that declares `cards` breaks into one card per topic.
+- Tapping any card opens ONE project-wide reel — scroll from any topic to the project's first
+  or last without backing out. `FeedSheet` now takes `panels` + `startAt` instead of a tab.
+- The sheet's page title is the focused topic (rendered by `NavMenu`), not the project name;
+  the back button is measured onto that title rather than pinned to a fixed rect.
+- Cards demonstrate what they document: Component carries the draggable `PillJar` of real
+  widget names, Typography the "Aa" in the shipped face, Grid & Layout a measured inspect
+  overlay on its own corner glyph.
+- Header sidebar: team card (avatar stack capped at 3 + `+n`) and downloads card, height
+  matched to the measured bio column. **Both hold placeholder figures — replace before ship.**
+
+**Layout**
+- `.page-shell` — one centred 1600px column every surface positions against (home nav, sheet
+  header/nav, profile column), so the page stops hugging the left edge on wide screens and the
+  profile title still lands on the feed title's rect.
+- The fade band spans the viewport, not the shell, so panel content cannot scroll past it.
+- Prototype iframe is locked to a 390×844 viewport and CSS-scaled to the model, so shrinking
+  the mockup no longer reflows the app.
+- Focused device 86% → 58% of viewport height; parked device smaller and moved right; side
+  action buttons 80 → 56px and anchored to the shell.
+
+**Spacing rule (project-wide)** — the ladder climbs in 8px with a ±4px half-step, in px not pt.
+Snapped 53 off-grid values across five components (`gap-1.5`, `py-2.5`, `px-3.5`, `-[9px]`,
+`-[71px]`, `-[210px]`, `-[250px]`, `-[94px]`, `-[90px]`, `-[150px]`, `py-[1px]`); a regex audit
+over `src/**/*.jsx` now reports no spacing value that is not a multiple of 4.
+
 ### 2026-07-16 — Initial release
 - **Vertical feed (TikTok-style):** full-page snap scroller, sections Home → projects → Contact.
 - **Wheel-picker menu (NavMenu):** 3D cylindrical menu; labels + focused title/description rotate with scroll position (`position` prop); soft spring, no bounce/flicker.
