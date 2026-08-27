@@ -12,7 +12,10 @@ import { usePortfolio, VIEW } from '../context/PortfolioContext'
 export default function LayoutWrapper() {
   const { view } = usePortfolio()
   return (
-    <div className="h-dvh w-full bg-[#fafafa]">
+    // A shade under the pages, not the same #fafafa. The feed clips itself to a
+    // circle during a stage change and THIS is what shows around it — matched to
+    // the page it revealed nothing, because pale was opening over pale.
+    <div className="h-dvh w-full bg-[#e7e4dd]">
       <VerticalFeed />
       <AnimatePresence>{view === VIEW.DETAIL && <ProjectDetail key="detail" />}</AnimatePresence>
     </div>

@@ -1,0 +1,26 @@
+.lanyard-wrapper {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  /* Fills its section rather than the viewport. Upstream hardcodes 100vh, which
+     inside a section that is already one viewport tall pushed the card down by
+     the height of everything above it. */
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: scale(1);
+  transform-origin: center;
+}
+
+/* The cast shadow. Everything above lights the card; nothing put it in front of
+   the page, and once the face was reading as white paper the card had no edge
+   left against #fafafa on the two sides the light comes from.
+   Applied to the canvas rather than drawn in the scene: a shadow in three needs a
+   surface to fall on, and this card hangs in the air. `drop-shadow` follows the
+   canvas's own alpha silhouette, so it shadows the card AND the strap, and it
+   swings with them. Offset down and right, away from the key light at [-3, 4, 5]. */
+.lanyard-wrapper canvas {
+  filter: drop-shadow(10px 14px 22px rgba(33, 34, 31, 0.16))
+          drop-shadow(2px 3px 5px rgba(33, 34, 31, 0.1));
+}

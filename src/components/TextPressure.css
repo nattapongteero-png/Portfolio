@@ -1,0 +1,88 @@
+/* Upstream ships these rules inside a <style> element the component injects on
+   every mount. Here they live in a real stylesheet — one copy, scoped to the
+   component's own class names instead of a global `.flex` (which would collide
+   with Tailwind's own `.flex` on every element in the app). */
+
+.text-pressure {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.text-pressure__title {
+  margin: 0;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+  width: 100%;
+  font-weight: 100;
+  transform-origin: center top;
+}
+
+/* Both language layers occupy the same box, so the reveal circle lands on the
+   same spot in each and the swap reads as one word changing rather than two
+   words crossfading. */
+.text-pressure__layer {
+  position: absolute;
+  inset: 0;
+  /* Centred in the box, not parked at its top. Left at the top, a word half the
+     height of its container sat above the middle while the cursor-reveal circle
+     was aimed at the middle — the reveal missed the letters entirely on short
+     viewports, where the gap is largest. */
+  display: flex;
+  align-items: center;
+  /* A masked box tiles its mask by default, so glyphs that paint a hair past the
+     box get a second copy of the gradient rather than nothing — which reads as a
+     letter sliced off at the edge. */
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  /* And the mask clips to this box, so ink that sits outside it is simply gone.
+     A round letter's ink overshoots its advance width by a hair, which sliced the
+     last character of the line. The padding gives that overshoot somewhere to
+     land: the mask covers the padding box, the type is laid out inside it. The
+     amount is set inline — it has to scale with the type, and this element does
+     not inherit the title's font size. */
+  box-sizing: border-box;
+}
+
+/* Hang the word off one edge of its box instead of centring in it. Phone only:
+   on a wide screen the two words flank the pass and centring in each half is
+   what keeps them symmetrical — on a phone they are stacked and have to line up
+   with the page margin like everything else. */
+@media (max-width: 767px) {
+  .text-pressure--start .text-pressure__title {
+    text-align: left;
+  }
+
+  .text-pressure--end .text-pressure__title {
+    text-align: right;
+  }
+}
+
+.text-pressure--flex .text-pressure__title {
+  display: flex;
+  justify-content: space-between;
+}
+
+.text-pressure__char {
+  display: inline-block;
+  /* The variable axes are written straight to this property every frame. */
+  font-variation-settings: 'wght' 400, 'wdth' 100;
+}
+
+.text-pressure--stroke .text-pressure__char {
+  position: relative;
+}
+
+.text-pressure--stroke .text-pressure__char::after {
+  content: attr(data-char);
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: transparent;
+  z-index: -1;
+  -webkit-text-stroke-width: 3px;
+  -webkit-text-stroke-color: var(--tp-stroke-color, #ff0000);
+}

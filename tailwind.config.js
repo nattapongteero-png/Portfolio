@@ -10,7 +10,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Anuphan', 'Inter', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         'pop-in': {

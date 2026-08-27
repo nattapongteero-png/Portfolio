@@ -1,0 +1,63 @@
+/* React Bits' CardSwap stylesheet, as published — only the card's paint is the
+   site's instead of the demo's black-on-white: this site's pages are white cards
+   on #fafafa behind #e7e4dd hairlines, and a black card here would be the one
+   dark object on the page. */
+.card-swap-container {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: translate(5%, 20%);
+  transform-origin: bottom right;
+
+  perspective: 900px;
+  overflow: visible;
+}
+
+.card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 12px;
+  border: 1px solid #e7e4dd;
+  background: #ffffff;
+  box-shadow: 0 24px 48px -24px rgba(33, 34, 31, 0.28);
+
+  transform-style: preserve-3d;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+@media (max-width: 768px) {
+  .card-swap-container {
+    transform: scale(0.75) translate(25%, 25%);
+  }
+}
+
+@media (max-width: 480px) {
+  .card-swap-container {
+    transform: scale(0.55) translate(25%, 25%);
+  }
+}
+
+/* The training page centres the stack on its column instead of the demo's
+   bottom-right corner peek. The fan spreads up-and-right from the front card
+   (+60,-70 per step at desktop distances), so the front card sits half a step
+   down-left of true centre to put the GROUP's centre on the box's. */
+.training-stack .card-swap-container {
+  bottom: 50%;
+  right: 50%;
+  transform: translate(calc(50% - 30px), calc(50% + 35px));
+}
+
+@media (max-width: 768px) {
+  .training-stack .card-swap-container {
+    transform: translate(calc(50% - 20px), calc(50% + 25px)) scale(0.75);
+  }
+}
+
+@media (max-width: 480px) {
+  .training-stack .card-swap-container {
+    transform: translate(calc(50% - 20px), calc(50% + 25px)) scale(0.55);
+  }
+}

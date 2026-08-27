@@ -14,9 +14,15 @@ body,
 
 body {
   margin: 0;
-  background: #fafafa;
+  /* A shade under the page, not the same #fafafa. The page is clipped to a
+     circle during a stage change, and the body is what shows around it — matched
+     exactly, the circle had nothing to be seen against and the whole transition
+     was invisible. This is the ground the page opens out of. */
+  background: #e7e4dd;
   color: #000;
-  font-family: 'Google Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  /* Anuphan first so Thai is loopless everywhere; Inter/system only as the
+     fallback while the webfont loads. See the note in index.html. */
+  font-family: 'Anuphan', 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
 }
@@ -46,7 +52,7 @@ body {
    state on <body>; the menu simply steps aside. */
 /* Only narrow screens need this: there the focused device fills the viewport,
    so the menu would sit right on top of the app. Wider screens keep the menu
-   visible and show a "MyAtlas / Prototype" breadcrumb instead. */
+   visible and show a "Pawmely / Prototype" breadcrumb instead. */
 @media (max-width: 767px) {
   body[data-proto-focused='1'] .nav-menu {
     opacity: 0;
@@ -65,3 +71,67 @@ body {
   width: 100%;
   max-width: 1600px;
 }
+
+/* A link whose underline is the hover state, not the resting one: it draws
+   itself left-to-right under the sentence when pointed at, and leaves the same
+   way. The arrow beside the text is what says "link" at rest. */
+.slide-link {
+  position: relative;
+}
+.slide-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+.slide-link:hover::after {
+  transform: scaleX(1);
+}
+
+
+/* Content arriving after a page change. The wipe uncovers a page that is already
+   finished, which reads as the page having been there all along and the cover
+   simply being taken off — so the lines come up in order behind it instead, the
+   first one starting while the arc is still on screen.
+   Applied to a wrapper; every direct child gets the animation and the delays
+   step down the list. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+/* 920ms, not the 520 it started at: at 520 every line had stopped moving within
+   a second of the swap, and the whole arrival read as hurried — the curtain is
+   slow and soft, so the lines behind it must be too. Same curve, just given
+   room; most of the easing's travel happens early, the last third is a drift. */
+.rise-in > * {
+  animation: rise-in 920ms cubic-bezier(0.16, 0.84, 0.3, 1) both;
+  /* Pinned to its own compositor layer for the whole ride. Without this the
+     browser re-rasterises the text at every sub-pixel step of the slow tail,
+     and the anti-aliasing re-settling each frame reads as the big masthead
+     name shimmering. translate3d in the keyframes + will-change keeps the
+     glyphs painted ONCE and only moved. */
+  will-change: transform, opacity;
+}
+/* The column restarts on the same frame the curtain starts handing over, so the
+   first line is already moving while the curtain is still fading — by the time
+   it is gone there is something to look at. 140ms apart, well inside each line's
+   own 920ms, so they overlap into one movement running down the column rather
+   than separate arrivals. */
+.rise-in > *:nth-child(1) { animation-delay: 0ms; }
+.rise-in > *:nth-child(2) { animation-delay: 140ms; }
+.rise-in > *:nth-child(3) { animation-delay: 280ms; }
+.rise-in > *:nth-child(4) { animation-delay: 420ms; }
+.rise-in > *:nth-child(5) { animation-delay: 560ms; }
+.rise-in > *:nth-child(6) { animation-delay: 700ms; }

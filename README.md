@@ -30,6 +30,31 @@ npm run deploy   # build + publish dist/ to gh-pages branch
 
 > ทุกครั้งที่อัปเดต/push ให้บันทึกรายละเอียดการแก้ไขไว้ที่นี่ (ใหม่สุดอยู่บน).
 
+### 2026-08-27 — Project stage แบบ hirotos, arc-wipe transition, action row ในคอลัมน์เนื้อหา
+
+**Project stage rework (อ้างอิง hirotos.com)** — หน้าโปรเจคเลิกเป็น scroll กลายเป็น "เพจ":
+- ปุ่มย้อนกลับ/scrollbar/progress rail ออกหมด; navigation ผ่านแถวชื่อโปรเจคล่างซ้าย (label
+  PROJECT สีอ่อน + เส้น hairline + ชื่อ; hover เข้มขึ้น + ลูกศร ↗) และเมนู + มุมขวาบน
+- **ArcWipe curtain** (`ArcWipe.jsx` ใหม่): dim 300ms → ม่านขาวขอบโค้ง (ellipse RX 1.35vw,
+  RY 1800) กวาดล่างขึ้นบนรอบเดียวด้วย exponential ease (τ=250ms วัดจาก reference จริงแบบ
+  frame-by-frame), จอดม่านใต้จอทั้งเส้นโค้ง (รวม sag ~128px) ไม่ให้มุมโผล่ก่อนเลื่อน
+- **Masthead**: ชื่อโปรเจคใหญ่มุมซ้ายบน อยู่ใต้ชั้น dim/ม่าน — มืดตามหน้า โดนม่านปิด แล้วลอย
+  ขึ้นพร้อมเนื้อหา; `rise-in` ยืดเป็น 920ms / stagger 140ms + GPU layer กัน text สั่น
+- โปรเจคครบ 5 ชื่อ (เพิ่ม Metaherb Cafe + MyAtlas เป็น placeholder ชื่ออย่างเดียว รอข้อมูลจริง)
+
+**Action row ในคอลัมน์เนื้อหา (desktop)** — 3 ปุ่ม (avatar/หัวใจ/แชร์) ย้ายจากมุมขวาล่างขึ้น
+บนสุดของคอลัมน์ขวา ขนาดเท่ากัน 56px ทั้งสามปุ่ม ลูกศร ↗ ของ avatar โผล่ตอน hover; ปุ่ม
+"เล่น UI Prototype" อยู่ล่างสุด; คอลัมน์ยึดหัว (top-anchored) กด "เพิ่มเติม" แล้วไม่มี UI ขยับ;
+ตอน prototype เปิด คอลัมน์ยกขึ้นเหนือ click-catcher — ปุ่มฝั่งขวากดได้ระหว่างเล่น prototype
+
+**เมนู Contact = ท่าเดียวกับพลิกบัตร** — กด Contact ในเมนู: กลับหน้าแรก + บัตรพลิกไปหน้า
+contact + pills (instagram/linkedin/email/phone) ร่วงลงมา ผ่าน event `flipContact()` ใน
+`contactPage.js` (แทนการเปิดหน้า overlay แบบเดิม)
+
+**อื่นๆ** — หน้า Training ใช้ปุ่ม + จริงตัวเดียวกับทั้งเว็บ (z-lift), ใบ cert 3 ใบ, สื่อ
+Pawmely/Metaherb/MobileMetaherb ครบชุด, โมเดล MacBook Pro (`macbook_pro_m3_16.glb`),
+ระบบสีทดลองถูกถอดกลับทั้งหมด (ทุก section พื้น `#fafafa`)
+
 ### 2026-07-22 — Design System pages, project reel, 8px spacing rule
 
 **Design System detail pages (`FeedSheet.jsx`)** — three data-driven specimen panels. Every

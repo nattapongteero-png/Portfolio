@@ -39,7 +39,7 @@ export const SCREEN_MESH = {
 
 export const PERSPECTIVE = 1400 // must match the CSS `perspective` on the rig
 
-function Phone({ screenW, swingY }) {
+export function Phone({ screenW, swingY = 0 }) {
   const { scene } = useGLTF(GLB)
   // Turn the screen plane into a depth-only holdout: it writes depth but no
   // colour, and renders first. The phone's back and innards then fail the depth
@@ -49,8 +49,14 @@ function Phone({ screenW, swingY }) {
   // (z 0.1287 > 0.1253), so they still draw over it — a real bezel, for free.
   // Just hiding the mesh doesn't work: the phone is a closed solid, so you'd see
   // its back panel from the inside instead of the office.
-  useMemo(() => {
-    scene.traverse((o) => {
+  // Its OWN clone of the scene. A three object has exactly one parent, so two
+  // sections both showing the phone (Pawmely and Metaherb Mobile) handing the
+  // same cached scene to two <primitive>s mounts only the LAST one — measured:
+  // Pawmely's device vanished and only its app iframe was left. Same reason
+  // PhoneFrames clones per cell.
+  const inst = useMemo(() => {
+    const c = scene.clone(true)
+    c.traverse((o) => {
       if (!o.isMesh) return
       if (o.material?.name === SCREEN_MATERIAL) {
         o.material = o.material.clone()
@@ -69,6 +75,7 @@ function Phone({ screenW, swingY }) {
         o.material.depthWrite = false
       }
     })
+    return c
   }, [scene])
   // Scale so the model's screen is exactly screenW px wide.
   const s = screenW / SCREEN_MESH.w
@@ -80,7 +87,7 @@ function Phone({ screenW, swingY }) {
           round in its own group so the swing above stays in CSS's terms. */}
       <group rotation={[0, Math.PI, 0]}>
         <primitive
-          object={scene}
+          object={inst}
           scale={[s, s, s]}
           position={[-SCREEN_MESH.cx * s, -SCREEN_MESH.cy * s, -SCREEN_MESH.cz * s]}
         />
@@ -97,6 +104,11 @@ export default function PhoneModel({ cx, cy, screenW, swingY, opacity = 1, vw, v
       style={{ opacity, visibility: opacity <= 0 ? 'hidden' : 'visible' }}
     >
       <Canvas
+        // Render on demand: there is no useFrame in the scene, so a frame is only
+        // needed when a prop changes (the phone's swing, a resize, an asset
+        // finishing load). R3F invalidates on those automatically. This stops the
+        // canvas from repainting 60fps while the phone sits still or is faded out.
+        frameloop="demand"
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
         resize={{ scroll: false, offsetSize: true }}

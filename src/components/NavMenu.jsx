@@ -1,200 +1,327 @@
 // -----------------------------------------------------------------------------
 // NavMenu.jsx
-// The top-left navigation menu: a sliding window of three items around the
-// focused section — previous · [ FOCUSED ] · next. Titles only; descriptions
-// and hashtags live in the section content itself. The focused title renders
-// big; neighbours are muted, tappable labels. Items drift vertically with the
-// scroll position (same axis as the page) and cross-fade.
+// The top-left navigation: every section title laid out on React Bits'
+// OptionWheel, curling away above and below the one you're on. It replaces the
+// old three-item sliding window — the wheel shows the whole feed at once, and
+// the distance-based blur/fade does the work the window used to do by simply
+// not rendering the far items.
+//
+// The wheel runs in CONTROLLED mode: `position` (the feed's fractional scroll)
+// is its input. That matters twice over — the wheel then tracks the scroll
+// continuously instead of stepping between discrete states, and the component's
+// own non-passive wheel listener (which preventDefaults) is never attached, so
+// the nav cannot swallow the page's scrolling wherever the two overlap.
 // -----------------------------------------------------------------------------
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import OptionWheel from './OptionWheel'
+import TrueFocus from './TrueFocus'
 
-// Flat vertical transform — items slide up/down on the SAME axis as the page
-// scroll (no 3D tilt), so the menu moves in lockstep with scrolling. `offset`
-// is the item's fractional distance from the focused section.
-const SLOT = 16 // px parallax per slot (on top of the flex layout)
-function wheelTransform(offset) {
-  const dist = Math.abs(offset)
-  return {
-    y: offset * SLOT,                          // subtle vertical drift with scroll
-    opacity: Math.max(0, 1 - dist * 0.62),     // neighbours fade back
-    scale: 1 - Math.min(dist, 1) * 0.1,        // slight depth for the focus
-  }
-}
+// Label size in rem. ONE size for every row, the way the reference's nav is
+// set: the page you are on is told apart by its ink, not by being three times
+// the size of the others. The page's own name is printed on the page itself now
+// (see the copy column in FeedSection), so this corner is a nav and only a nav.
+const FONT_REM = { base: 0.9375, md: 1 }
+const FONT_REM_COMPACT = { base: 0.875, md: 0.9375 }
+const SPACING = 1.55 // row height as a multiple of the font size
+// How far a title one step out from the middle shrinks — see `itemScale` below.
+const ITEM_SCALE = { base: 0.34, compact: 0.24 }
+const NEIGHBOUR_SCALE = 1 - ITEM_SCALE.base
 
-// Enter/leave from one slot further out so items flow in vertically.
-function wheelEdge(offset) {
-  const step = offset === 0 ? 1 : Math.sign(offset)
-  return { ...wheelTransform(offset + step), opacity: 0 }
-}
-
-// Slide, don't spring — no overshoot means no bounce.
-const wheelTween = { type: 'tween', ease: [0.22, 1, 0.36, 1], duration: 0.5 }
-
-// The breadcrumb rides the SAME curve and length as the device's focus move
-// (easeInOutQuad over ~1s), so the two read as one gesture instead of two
-// animations glancing off each other.
-const CRUMB_TWEEN = { type: 'tween', ease: [0.45, 0, 0.55, 1], duration: 0.95 }
-
-// Which three (or fewer) indices to render around the active one.
-function windowAround(active, n) {
-  if (n <= 3) return Array.from({ length: n }, (_, i) => i)
-  if (active <= 0) return [0, 1, 2]
-  if (active >= n - 1) return [n - 3, n - 2, n - 1]
-  return [active - 1, active, active + 1]
-}
-
-// `compact` renders the same menu (same window, same drift/spring animation) at
-// the smaller scale a detail page needs under its own page title.
 export default function NavMenu({
   sections,
   activeIndex,
   position = activeIndex,
   onNavigate,
   compact = false,
-  positionClass = 'left-4 top-6 md:left-[120px] md:top-12',
-  // When set, the focused title shrinks and this label follows it as a
-  // breadcrumb — "MyAtlas / Prototype" — so the page you came from stays on
-  // screen instead of vanishing.
+  // On a phone the title sits the same 20 from the top as it does from the left,
+  // so the corner reads as one even margin — plus the status bar / notch, or it
+  // would sit behind the system clock. 20, not 16: at 16 the titles read as
+  // stuck to the edge rather than set in from it. Desktop keeps its own 120/48.
+  positionClass =
+    'left-5 top-[calc(env(safe-area-inset-top,0px)+20px)] md:left-[120px] md:top-12',
+  // Flips the titles to light ink for sections that run on a dark background.
+  dark = false,
+  // The focused title's ink. Sections hand over their project's own accent, so
+  // the heading is coloured by the thing you are looking at instead of being
+  // the same near-black on every page. Falls back to the site's ink.
+  accent = null,
+  // When set, this section's title reads "Pawmely / Prototype". The crumb is
+  // permanent for a section that HAS a prototype — closing it does not delete
+  // the word, it just hands the focus back to the section name and lets
+  // "Prototype" fall back to the small, blurred treatment every unfocused title
+  // gets. A word that vanishes reads as something being destroyed; a word that
+  // steps back reads as somewhere you can still go.
   breadcrumb = null,
+  // Which option carries the crumb. Without it the crumb would follow whatever
+  // is focused and label the wrong section.
+  breadcrumbIndex = null,
+  // Whether the crumb currently HAS the focus (the prototype is open).
+  breadcrumbFocused = false,
   // Called when the (now muted) section title is tapped while a breadcrumb is
   // showing — the standard "go up a level" affordance.
   onBreadcrumbBack = null,
+  // Called when the crumb itself is clicked while it is NOT focused — the way
+  // in, mirroring onBreadcrumbBack as the way out.
+  onBreadcrumbOpen = null,
+  // Renders the sections as a STATIC list instead of the wheel: the rows never
+  // move, and changing page moves only the ink from one row to another — the
+  // reference site's own nav. The wheel is still what the scrolling stages use,
+  // where the rows have to track a continuous scroll position.
+  list = false,
 }) {
-  // Which section is "big" follows the scroll, but with hysteresis: it only
-  // flips once the scroll is >0.6 past the current section. A plain round()
-  // flips at exactly .5, which jitters while the eased scroll settles.
-  const [focusIndex, setFocusIndex] = useState(() =>
-    Math.max(0, Math.min(sections.length - 1, Math.round(position)))
+  // The wheel lays itself out in JS from a pixel row height, so the breakpoint
+  // has to be read rather than expressed in CSS.
+  const [isMd, setIsMd] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
   )
   useEffect(() => {
-    setFocusIndex((cur) => {
-      if (position > cur + 0.6) return Math.min(sections.length - 1, cur + 1)
-      if (position < cur - 0.6) return Math.max(0, cur - 1)
-      return cur
-    })
-  }, [position, sections.length])
+    const mq = window.matchMedia('(min-width: 768px)')
+    const onChange = (e) => setIsMd(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
 
-  const indices = windowAround(focusIndex, sections.length)
+  const sizes = compact ? FONT_REM_COMPACT : FONT_REM
+  const fontSize = isMd ? sizes.md : sizes.base
+  const rowPx = fontSize * 16 * SPACING
 
-  return (
-    <div
-      className={`nav-menu pointer-events-none absolute z-[16] flex max-w-[82%] cursor-grab touch-none flex-col active:cursor-grabbing md:max-w-[620px] ${
-        compact ? 'gap-2 md:gap-2' : 'gap-2 md:gap-3'
-      } ${positionClass}`}
-    >
-      <motion.div
-        // `items-start`, not the default stretch: otherwise every row is as wide
-        // as the widest one, and since neighbours are scaled about their centre
-        // they visibly slide sideways whenever the active row's width changes
-        // (e.g. when the breadcrumb appears).
-        className={`flex flex-col items-start ${compact ? 'gap-2 md:gap-2' : 'gap-2 md:gap-3'}`}
-        drag="y"
-        dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={0.18}
-        dragMomentum={false}
-        onDragEnd={(_, info) => {
-          const past = Math.abs(info.offset.y) > 60 || Math.abs(info.velocity.y) > 300
-          if (!past) return
-          const dir = info.offset.y < 0 ? 1 : -1 // drag up = next
-          const next = Math.min(sections.length - 1, Math.max(0, focusIndex + dir))
-          if (next !== focusIndex) onNavigate(next)
-        }}
-      >
-        <AnimatePresence initial={false} mode="popLayout">
-          {indices.map((idx) => {
-            const s = sections[idx]
-            const isActive = idx === focusIndex
-            const offset = idx - focusIndex   // discrete — enter/exit direction
-            const liveOffset = idx - position // fractional — tracks scroll
-            // With a breadcrumb the title is a level you can climb back to.
-            // It stays an <h2> either way: swapping the element type would
-            // remount it, and the size transition would snap instead of easing.
-            const canGoBack = isActive && breadcrumb && onBreadcrumbBack
+  // The crumb takes the focus a beat after it is opened, so the handover is
+  // SEEN — the section name shrinking back as "Prototype" grows. Arriving
+  // already focused would read as the label simply changing.
+  const [crumbFocus, setCrumbFocus] = useState(0)
+  useEffect(() => {
+    if (!breadcrumbFocused) {
+      setCrumbFocus(0)
+      return
+    }
+    const id = setTimeout(() => setCrumbFocus(2), 220)
+    return () => clearTimeout(id)
+  }, [breadcrumbFocused])
 
+  const items = sections.map((s) => s.title)
+  const focusIndex = Math.max(0, Math.min(sections.length - 1, Math.round(position)))
+  const focused = sections[focusIndex]
+
+  if (list) {
+    // The reference layout: the CURRENT project's name set large in the top-left
+    // corner — the page's own masthead — and the whole set of projects listed
+    // along the bottom-left as small labelled columns, each opened by a hairline,
+    // the way the reference prints BASE / FOCUS / INDEX. Nothing moves when the
+    // page changes; the big name swaps and the ink moves along the bottom row.
+    const rows = sections
+      .map((s, i) => ({ ...s, i }))
+      .filter((s) => s.title)
+    const focusedRow = rows.find((r) => r.i === focusIndex) ?? rows[0]
+    return (
+      <>
+        {/* The masthead. Keyed on the name so a page change remounts it and the
+            rise-in replays. It sits UNDER the wipe's dim (z-13) and curtain
+            (z-14), unlike the rest of the nav: the big name is the PAGE's own
+            heading, so it dims with the page, disappears under the curtain, and
+            rises back in with the content — at z-16 it floated on top of the
+            curtain and swapped in plain sight. */}
+        <div
+          key={focusedRow?.title}
+          className={`nav-menu rise-in pointer-events-none absolute z-[12] max-w-[82%] md:max-w-[720px] ${positionClass}`}
+        >
+          <h2
+            className="pointer-events-auto text-3xl font-bold leading-none tracking-tight md:text-6xl"
+            style={{ color: dark ? '#ffffff' : '#21221f' }}
+          >
+            {breadcrumbFocused && onBreadcrumbBack ? (
+              <button type="button" onClick={onBreadcrumbBack} className="text-left">
+                {focusedRow?.title}
+              </button>
+            ) : (
+              focusedRow?.title
+            )}
+          </h2>
+        </div>
+        {/* The index along the bottom — every project, the one you are on in
+            full ink. Hidden on a phone: the caption band lives down there. */}
+        <div className="pointer-events-none fixed bottom-10 left-8 z-[16] hidden gap-10 md:flex">
+          {rows.map((s) => {
+            const on = s.i === focusIndex
+            const ink = dark ? '#ffffff' : '#21221f'
+            const faint = dark ? 'rgba(255,255,255,0.4)' : 'rgba(33,34,31,0.4)'
             return (
-              <motion.div
-                key={s.domId}
-                initial={wheelEdge(offset)}
-                animate={wheelTransform(liveOffset)}
-                exit={{ ...wheelEdge(offset), transition: wheelTween }}
-                transition={{ type: 'spring', stiffness: 520, damping: 72 }}
-                className="pointer-events-auto"
+              <button
+                key={s.domId ?? s.title}
+                type="button"
+                onClick={() => {
+                  if (on && breadcrumbFocused && onBreadcrumbBack) onBreadcrumbBack()
+                  else if (!on) onNavigate(s.i)
+                }}
+                // The reference's own column anatomy: a pale category word, a
+                // hairline, the value under it. Hover does not underline — the
+                // name inks up to full and the leaving-arrow steps in after it,
+                // the same ↗ every outward link on this site carries.
+                className="group pointer-events-auto min-w-[132px] text-left"
               >
-                {!isActive ? (
-                  <button
-                    onClick={() => onNavigate(idx)}
-                    className={`text-left font-medium text-[#9c988e] transition-colors hover:text-[#33332f] md:text-2xl ${
-                      compact ? 'text-xl' : 'text-lg'
-                    }`}
+                <span className="block text-[10px] font-medium uppercase tracking-[0.14em]" style={{ color: faint }}>
+                  Project
+                </span>
+                <span
+                  className="mt-2 block border-t pt-2.5"
+                  style={{ borderColor: dark ? 'rgba(255,255,255,0.25)' : 'rgba(33,34,31,0.2)' }}
+                >
+                  <span
+                    // Colour through vars + classes, not an inline `color`: an
+                    // inline style outranks any hover class, which is why the
+                    // first cut of this never darkened.
+                    className="text-[13px] font-semibold leading-tight transition-colors duration-300 text-[color:var(--idx-c)] group-hover:text-[color:var(--idx-ink)]"
+                    style={{ '--idx-c': on ? ink : faint, '--idx-ink': ink }}
                   >
                     {s.title}
-                  </button>
-                ) : (
-                  <>
-                    {/* Never wraps: mid-transition the title is growing back to
-                        full size while the crumb is still on screen, and a wrap
-                        would double the row height and shove the menu below it
-                        down. Overflow is harmless — the menu is decorative and
-                        the device paints over it. */}
-                    <div className="flex flex-nowrap items-baseline gap-x-3 whitespace-nowrap">
-                      <h2
-                        {...(canGoBack
-                          ? {
-                              onClick: onBreadcrumbBack,
-                              role: 'button',
-                              tabIndex: 0,
-                              onKeyDown: (e) =>
-                                (e.key === 'Enter' || e.key === ' ') && onBreadcrumbBack(),
-                            }
-                          : {})}
-                        // With a breadcrumb the section title steps back — it
-                        // is where you came FROM — and the crumb takes over the
-                        // full size and weight the title had.
-                        className={`font-bold leading-none tracking-tight transition-all duration-[950ms] ease-[cubic-bezier(0.45,0,0.55,1)] ${
-                          compact
-                            ? 'text-3xl text-[#21221f] md:text-4xl'
-                            : breadcrumb
-                              ? 'cursor-pointer text-2xl text-[#9c988e] hover:text-[#4e4e4e] sm:text-3xl md:text-4xl'
-                              : 'text-3xl text-[#21221f] sm:text-5xl md:text-7xl'
-                        }`}
-                      >
-                        {s.title}
-                      </h2>
-                      <AnimatePresence>
-                        {breadcrumb && (
-                          <motion.div
-                            key="crumb"
-                            // Scales as well as fades, mirroring the title's
-                            // font-size move: 0.5 -> 1 is the same 36px -> 72px
-                            // range MyAtlas travels, so the two halves of the
-                            // breadcrumb grow and shrink as one.
-                            initial={{ opacity: 0, x: -8, scale: 0.5 }}
-                            animate={{ opacity: 1, x: 0, scale: 1 }}
-                            exit={{ opacity: 0, x: -8, scale: 0.5 }}
-                            transition={CRUMB_TWEEN}
-                            style={{ transformOrigin: 'left center' }}
-                            className="flex flex-nowrap items-baseline gap-x-3"
-                          >
-                            <span className="text-2xl font-light text-[#c4beb3] sm:text-3xl md:text-4xl">
-                              /
-                            </span>
-                            <span className="text-3xl font-bold leading-none tracking-tight text-[#21221f] sm:text-5xl md:text-7xl">
-                              {breadcrumb}
-                            </span>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                    {s.footer}
-                  </>
-                )}
-              </motion.div>
+                    <svg
+                      className="ml-1 inline-block size-[11px] -translate-y-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      viewBox="0 0 24 24"
+                      aria-hidden
+                      focusable="false"
+                    >
+                      <path
+                        d="M8 16 L16 8 M9.5 8 H16 V14.5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </span>
+              </button>
             )
           })}
-        </AnimatePresence>
-      </motion.div>
+        </div>
+      </>
+    )
+  }
+
+  return (
+    <>
+    <div
+      className={`nav-menu pointer-events-none absolute z-[16] flex max-w-[82%] flex-col md:max-w-[620px] ${positionClass}`}
+      // The wheel centres its options on the middle of this box, so the box has
+      // to be offset such that the SELECTED option's TOP EDGE lands exactly on
+      // `positionClass`'s top — the same place the old h2 started.
+      //
+      // Anchoring on the top edge rather than the box is what keeps the title
+      // in the same spot across pages. The row height scales with the font
+      // size, so anchoring the box (or its centre) put the home title and the
+      // smaller detail-page title on different baselines, and moving between
+      // them made the heading jump.
+      // On a phone the whole BLOCK has to clear the top edge, not just the
+      // focused row: the previous section's title curls up above it and was the
+      // thing actually touching the edge. Shifting down by one row puts that
+      // peeking title on the margin instead, and the focused title lands a row
+      // below it. Desktop keeps the focused title itself on the margin, which
+      // is what every page's heading is aligned to.
+      style={{
+        // Room for the heading plus the whole list under it — five sections at
+        // the tighter row height no longer fit in the old three rows.
+        height: rowPx * 7,
+        // Anchors the FOCUSED title's top edge on the margin — the baseline
+        // every page's heading shares. Nothing is drawn above it on a phone, so
+        // this is the top of the block there too.
+        marginTop: (fontSize * 16) / 2 - (rowPx * 7) / 2,
+      }}
+    >
+      <OptionWheel
+        items={items}
+        value={position}
+        // While the prototype is open you are inside this section, so only this
+        // section's own title answers the pointer.
+        locked={breadcrumbFocused}
+        onChange={(idx) => {
+          // Tapping the title you are already on, while a breadcrumb is
+          // showing, is the way back up a level.
+          if (idx === focusIndex && breadcrumbFocused && onBreadcrumbBack) onBreadcrumbBack()
+          else onNavigate(idx)
+        }}
+        side="left"
+        inset={0}
+        fontSize={fontSize}
+        spacing={SPACING}
+        // No lead gap: every row is the same size now, so the even pitch is
+        // already even to the eye.
+        leadGap={0}
+        // Flat. The wheel's curl and tilt were doing the work of saying "these
+        // are further away"; the list reads that from grey alone now, and a
+        // stack of straight left-aligned lines is what the reference is.
+        curve={0}
+        tilt={0}
+        // While the prototype has the focus, the sections either side of it are
+        // two steps removed — you are inside Pawmely, not next to Metaherb — so
+        // they push further back than they do during ordinary scrolling.
+        // No blur on the unfocused rows — they are a plain grey list, not
+        // something being pushed out of focus. Only the prototype's takeover
+        // still blurs, because there the other sections really are a level away.
+        blur={breadcrumbFocused ? (compact ? 1.2 : 2) * 2.4 : 0}
+        fade={breadcrumbFocused ? 0.8 : 0.42}
+        // A floor, so the third and fourth rows stay as legible as the first
+        // one under it instead of ramping away to nothing — the reference lists
+        // every remaining page at one weight.
+        minOpacity={breadcrumbFocused ? 0 : 0.45}
+        // Still applies to a neighbour on its way in — see `visible` below.
+        // No shrinking at all. Every row is one size and one line; the rows you
+        // are not on step back in colour only.
+        itemScale={0}
+        minScale={1}
+        // Asymmetric on purpose: the section you are ON, plus every page still
+        // to COME listed under it — and nothing above, because the titles you
+        // have already passed are not where you are going. The wheel's cull is a
+        // ramp (`visible + 1 - distance`), so the previous title still recedes
+        // rather than blinking off as you leave it.
+        visibleBefore={0}
+        visibleAfter={4}
+        smoothing={160}
+        // The SAME ink the focused title uses, not a grey of its own: the
+        // wheel's own fade (0.58 one step out) is what sets a coming title back,
+        // exactly as it sets the "Prototype" crumb back beside a focused one —
+        // so the two unfocused words on screen read as one treatment. A separate
+        // warm grey on top of that fade made the coming title a different colour
+        // from the crumb sitting directly above it.
+        textColor={dark ? 'rgba(255,255,255,0.45)' : '#21221f'}
+        activeColor={accent ?? (dark ? '#ffffff' : '#21221f')}
+        className="option-wheel--display"
+        renderItem={(label, idx) =>
+          // The breadcrumb rides on the selected option itself, so it stays one
+          // line of the wheel rather than a second element floating beside it.
+          // Opening the prototype is a change of focus, not just a change of
+          // label, so the crumb says so: the frame travels off the section name
+          // and onto the word Prototype, and the name blurs back behind it.
+          breadcrumb && idx === (breadcrumbIndex ?? focusIndex) ? (
+            <TrueFocus
+              sentence={`${label} / ${breadcrumb}`}
+              activeIndex={crumbFocus}
+              staticIndices={[1]}
+              // No brackets. The words carry the focus themselves — sharp and
+              // full size against small and blurred — using exactly the same
+              // numbers the wheel gives its own neighbouring titles, so the
+              // crumb reads as one more step of the same system.
+              frame={false}
+              blurAmount={0}
+              // One size here too — the crumb is set back by ink, like every
+              // other unfocused word in this corner.
+              inactiveScale={1}
+              inactiveOpacity={1 - 0.42}
+              animationDuration={0.55}
+              hoverReveal
+              onWordClick={(w) => {
+                if (w === 0) onBreadcrumbBack?.()
+                else if (w === 2 && !breadcrumbFocused) onBreadcrumbOpen?.()
+              }}
+            />
+          ) : (
+            label
+          )
+        }
+      />
+      {/* Desktop keeps the section's own footer under its title. */}
+      {isMd && focused?.footer && <div className="pointer-events-auto">{focused.footer}</div>}
     </div>
+    </>
   )
 }

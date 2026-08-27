@@ -1,0 +1,233 @@
+/* The contact page's own adjustments to React Bits' BubbleMenu. Kept here rather
+   than edited into BubbleMenu.css, so that file stays a copy of upstream. */
+
+/* The menu's own bar is off on this page. Its logo bubble sits where the page's
+   title goes, and its toggle would be a second way out beside the site's own back
+   button — one page, one exit. The bar stays in the DOM: the page opens the menu
+   by pressing that toggle once, and a click still lands on a hidden element. */
+.contact-page .bubble-menu {
+  display: none;
+}
+
+/* The pills move out of the middle: the pass hangs there, and it is the thing the
+   page is continuing from. They take the lower third instead. */
+.contact-page .bubble-menu-items {
+  align-items: flex-end;
+  padding-bottom: 7vh;
+}
+
+@media (max-width: 899px) {
+  /* On a phone the list is a column, so it takes the bottom half rather than a
+     band, and the card hangs above it. */
+  .contact-page .bubble-menu-items {
+    align-items: flex-end;
+    padding-top: 0;
+    padding-bottom: 4vh;
+  }
+}
+
+/* Smaller pills than the demo's. Upstream sizes them to be the whole page — a
+   160px floor plus up to 8rem of padding came out 223px tall — and on this page
+   they share the screen with the pass, which has to hang at exactly the size and
+   position it has on the home screen. So the pills give way, not the card. */
+.contact-page .pill-link {
+  --pill-min-h: 92px;
+  min-height: var(--pill-min-h);
+  padding: clamp(1rem, 1.6vw, 2rem) 0;
+  font-size: clamp(1.05rem, 2.1vw, 2rem);
+}
+
+.contact-page .pill-list {
+  row-gap: 12px;
+}
+
+/* The pill, at the size and weight BubbleMenu gives its own — fully rounded, one
+   soft shadow — but sized by its LABEL instead of by a third of the row. Fixed
+   thirds is what stopped them from stacking and leaning on each other once they
+   were given to the physics.
+
+   Colour is per channel, set by the modifier below. The white pill was the menu
+   demo's; on a page whose whole job is "these are the ways to reach me", the
+   service's own colour tells you which is which before you have read the word. */
+.contact-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 clamp(20px, 2.4vw, 32px);
+  min-height: 92px;
+  font-size: clamp(1.05rem, 2.1vw, 2rem);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  border-radius: 999px;
+  background: var(--pill-bg, #ffffff);
+  color: var(--pill-ink, #21221f);
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(33, 34, 31, 0.18);
+  transition: filter 0.3s ease;
+  cursor: grab;
+}
+
+.contact-pill:active {
+  cursor: grabbing;
+}
+
+/* Shape per channel as well as colour, each taken from the corner the brand's own
+   product uses: Instagram and a phone call are round-ended, LinkedIn's surfaces
+   are a soft 16, Gmail's are Material's 8. The physics follows — PhysicsPills
+   chamfers each body to the corner the element is actually drawn with, so a
+   square-cornered pill collides as a square-cornered pill.
+
+   Brand colours, each taken from the service's own published mark.
+   Instagram has no single flat colour — its mark is the gradient, so the pill
+   wears the gradient. */
+.contact-pill--instagram {
+  --pill-ink: #ffffff;
+  background: linear-gradient(135deg, #833ab4 0%, #e1306c 55%, #f77737 100%);
+}
+
+.contact-pill--linkedin {
+  --pill-bg: #0a66c2;
+  --pill-ink: #ffffff;
+}
+
+/* Email goes to a Gmail address, so it wears Gmail's red. */
+.contact-pill--email {
+  --pill-bg: #ea4335;
+  --pill-ink: #ffffff;
+}
+
+/* Phone is the one channel with NO brand behind it — a phone number belongs to no
+   service. It takes the site's own contact accent (site.js `contact.accent`)
+   rather than borrowing a messaging app's green it has nothing to do with. */
+.contact-pill--phone {
+  --pill-bg: #1d8b6b;
+  --pill-ink: #ffffff;
+}
+
+@media (hover: hover) {
+  .contact-pill:hover {
+    filter: brightness(1.08);
+  }
+}
+
+/* The leave-the-site arrow, at the end of the name inside the part that opens —
+   so it slides out with the name instead of fading in on its own. */
+.contact-pill__mark {
+  width: 0.8em;
+  height: 0.8em;
+  flex: none;
+}
+
+/* The pill with no link behind it (LinkedIn, until a URL exists) does not offer
+   the arrow at all — there is nowhere for it to go. */
+.contact-pill:not(a) .contact-pill__mark {
+  display: none;
+}
+
+/* The white disc the brand mark sits in — 40 disc, 24 mark, both on the ladder. */
+.contact-pill__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.contact-pill__chip img,
+.contact-pill__chip svg {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Measured off the two artworks: Instagram's tile turns its corner at 22.6% of
+   its side, LinkedIn's at 6.2% — side by side at 24px that is 5.4px against 1.5px,
+   and the LinkedIn mark read noticeably squarer. Clipping it to Instagram's own
+   figure matches them; it costs only corner, the glyph sits well inside. */
+.contact-pill--linkedin .contact-pill__chip img {
+  border-radius: 22.6%;
+}
+
+/* The handset stands in for a mark that does not exist, so it is drawn in the
+   pill's own colour rather than in black. */
+.contact-pill--phone .contact-pill__chip svg {
+  color: #1d8b6b;
+}
+
+/* The arrow's track. A grid column animated from 0fr to 1fr is the one way to
+   slide something open to its OWN width — a max-width needs a number nobody can
+   know, and it stalls at the end when the guess was too big. Closed, the track is
+   zero wide, so there is no reserved hole at the end of the pill.
+   The pill itself changes width as this opens, which is why PhysicsPills is given
+   `resize`: the body is rescaled from the element instead of staying at whatever
+   it measured once. */
+.contact-pill__arrow {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns 0.34s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+.contact-pill__arrow > span {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+@media (hover: hover) {
+  .contact-pill:hover .contact-pill__arrow {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-pill:hover .contact-pill__arrow > span {
+    padding-left: 8px;
+    opacity: 1;
+    transition: opacity 0.22s ease 0.08s;
+  }
+}
+
+/* Held, it stays open whatever the pointer is over — see PhysicsPills. */
+.is-held .contact-pill__arrow {
+  grid-template-columns: 1fr;
+}
+
+.is-held .contact-pill__arrow > span {
+  padding-left: 8px;
+  opacity: 1;
+}
+
+/* The label swap ("instagram" -> "ntpmick ↗"): the wrapper tweens between the
+   two MEASURED widths (set inline by SwapLabel) while the labels, stacked
+   absolutely inside it, crossfade. Nothing is clipped and nothing is resolved
+   mid-animation — see SwapLabel for why the fr-track version was retired. */
+.contact-pill__swap {
+  position: relative;
+  display: block;
+  height: 1.6em;
+  transition: width 0.3s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+.contact-pill__face {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.18s ease 0.08s;
+}
+.contact-pill__face.is-off {
+  opacity: 0;
+  transition: opacity 0.14s ease;
+  pointer-events: none;
+}

@@ -1,0 +1,87 @@
+.option-wheel {
+  --ow-text-color: #a6a6a6;
+  --ow-active-color: #ffffff;
+  --ow-font-size: 3rem;
+  --ow-inset: 80px;
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  outline: none;
+}
+
+.option-wheel--dragging {
+  cursor: grabbing;
+}
+
+/* Each option is absolutely centered, then offset along the curve by the
+   rAF loop through transform/opacity/filter, so everything stays in step. */
+.option-wheel__item {
+  position: absolute;
+  top: 50%;
+  left: var(--ow-inset);
+  white-space: nowrap;
+  font-size: var(--ow-font-size);
+  line-height: 1;
+  font-weight: 200;
+  letter-spacing: -0.02em;
+  transform-origin: left center;
+  cursor: pointer;
+  will-change: transform, opacity, filter;
+  /* --ow-p goes 0 -> 1 as an option approaches the middle of the wheel */
+  color: color-mix(in srgb, var(--ow-active-color) calc(var(--ow-p, 0) * 100%), var(--ow-text-color));
+}
+
+.option-wheel--right .option-wheel__item {
+  left: auto;
+  right: var(--ow-inset);
+  transform-origin: right center;
+}
+
+.option-wheel__item--selected {
+  font-weight: 500;
+}
+
+/* The portfolio's nav is set in the page's own bold display weight rather than
+   the component's light default — the titles are the loudest thing on screen,
+   not a quiet picker. */
+.option-wheel--display .option-wheel__item {
+  font-weight: 700;
+}
+
+/* Non-interactive mode: the wheel is a readout of the feed's scroll position,
+   so it must not look or behave like something you grab. Pointer events stay
+   on the items themselves, which still navigate on click. */
+.option-wheel--readonly {
+  cursor: default;
+  touch-action: auto;
+  pointer-events: none;
+}
+
+.option-wheel--readonly .option-wheel__item {
+  pointer-events: auto;
+}
+
+/* Hovering a title brings it back into focus. `!important` because the rAF loop
+   writes filter/opacity inline every frame it runs, and inline wins over an
+   ordinary rule. Deliberately NOT transitioned: the loop rewrites these
+   properties on every frame of a scroll, and a transition would restart on each
+   write and leave the blur lagging the wheel.
+
+   While LOCKED (the section has something open inside it) only the selected
+   title still answers the pointer. The neighbours are not reachable from where
+   you are — you would have to come out first — so lighting them up on hover
+   offers something the click cannot deliver. */
+.option-wheel:not(.option-wheel--locked) .option-wheel__item:hover,
+.option-wheel--locked .option-wheel__item--selected:hover {
+  filter: blur(0px) !important;
+  opacity: 1 !important;
+}
+
+.option-wheel--locked .option-wheel__item:not(.option-wheel__item--selected) {
+  pointer-events: none;
+}
