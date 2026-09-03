@@ -151,7 +151,17 @@ export default function VerticalFeed() {
   const proto = protos[activeIndex] ?? null
   const [stage, setStage] = useState('home')
   const stageRef = useRef('home')
-  stageRef.current = stage
+  // NOT written on every render. `stageRef` is what the scroll fence reads, and
+  // `goToStage` sets it the moment the press happens — a render that then wrote
+  // the older state value back over it left the fence and the page describing
+  // two different stages. On a cold, slow first load that is exactly what
+  // happened: the scroller sat on the first project while the nav still drew
+  // the home wheel, so the project index row along the bottom never appeared
+  // (and a later re-render was what "fixed" it). The ref now only follows the
+  // state when the state is the newer of the two.
+  useEffect(() => {
+    stageRef.current = stage
+  }, [stage])
   const staged = stage !== 'home'
 
   // The hero has no entry in the menu, and neither has Contact while you are
@@ -273,6 +283,12 @@ export default function VerticalFeed() {
     const origin = pointerOrigin()
     stageRef.current = name
     setStage(name)
+    // Belt and braces for the same fault: if the state update is ever dropped —
+    // it was, on a slow first load, leaving the page half-turned — the next
+    // frames put it back. Cheap, and it cannot loop: setting a state to the
+    // value it already holds re-renders nothing.
+    requestAnimationFrame(() => setStage(name))
+    window.setTimeout(() => setStage(name), 220)
     if (el) el.scrollTo({ top: STAGES[name][0] * el.clientHeight, behavior: 'auto' })
     playReveal(origin)
   }

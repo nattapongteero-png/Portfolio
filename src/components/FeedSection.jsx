@@ -9,7 +9,7 @@
 // on the model's own screen.
 // -----------------------------------------------------------------------------
 
-import { useCallback, useState, useEffect, useLayoutEffect, useRef } from 'react'
+import { Suspense, useCallback, useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { Plus } from 'lucide-react'
@@ -723,6 +723,17 @@ export default function FeedSection({
               A section two pages away has nothing to show, so it holds no
               context — and the model remounts as it comes back into range. */}
           {Math.abs(offset) <= 1 && !detailOpen && (
+          // Its OWN suspense boundary. The model's GLB (and the HDR its
+          // lighting loads) suspend while they download, and without a boundary
+          // of their own that suspension reaches up and holds the whole feed's
+          // next commit. On a cold, slow first load that is what made the
+          // project stage arrive half-turned: the scroller had moved to the
+          // first project, but React was still showing the previous render, so
+          // the masthead and the project index row along the bottom were the
+          // home screen's — and only appeared once the model finished loading
+          // (or something else forced a commit, which is why moving away and
+          // back "fixed" it).
+          <Suspense fallback={null}>
           <DeviceModel
             cx={cx}
             cy={cy}
@@ -739,6 +750,7 @@ export default function FeedSection({
             vh={vh}
             persp={persp}
           />
+          </Suspense>
           )}
 
           {/* The screen rig — glass, cover art, live app — sits ABOVE the model's
@@ -1183,6 +1195,13 @@ export default function FeedSection({
                 className="absolute inset-x-0 bottom-0 top-[104px] md:top-0"
                 style={{ maskImage: fadeMask, WebkitMaskImage: fadeMask }}
               >
+                {/* Boundary of its own, for the same reason the device models
+                    have one: the pass's GLB and the scene's HDR suspend while
+                    they load, and an unbounded suspension up here froze the
+                    whole feed's next commit — the project stage could not paint
+                    its masthead or its index row until the hero's card had
+                    finished downloading. */}
+                <Suspense fallback={null}>
                 <Lanyard
                   position={[0, 0, 18]}
                   gravity={[0, -40, 0]}
@@ -1222,6 +1241,7 @@ export default function FeedSection({
                   tease
                   imageFit="cover"
                 />
+                </Suspense>
               </div>
 
               {/* The channels, dropped into the bottom of this same screen. They
