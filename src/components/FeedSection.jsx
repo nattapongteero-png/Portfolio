@@ -14,6 +14,7 @@ import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import SideActions from './SideActions'
+import { usePortfolio } from '../context/PortfolioContext'
 import ClampText from './ClampText'
 import PhoneModel, { SCREEN_MESH, PERSPECTIVE } from './PhoneModel'
 import MacModel, { MAC_SCREEN, PERSPECTIVE as MAC_PERSPECTIVE } from './MacModel'
@@ -233,6 +234,12 @@ export default function FeedSection({
   // angled on the left, 1 = facing you, centred and enlarged with the app live
   // on its screen. The app iframe is mounted (hidden) as soon as this section is
   // focused so it has booted long before the button is pressed.
+  // While a project's detail overlay is up it covers this page completely, and
+  // its report reel mounts device canvases of its own. Holding a WebGL context
+  // for a scene nobody can see is what pushed the page over the browser's
+  // context budget and had the laptop killed off underneath it.
+  const { view: portfolioView } = usePortfolio()
+  const detailOpen = portfolioView === 'detail'
   const [focus, setFocus] = useState(0)
   const [protoMounted, setProtoMounted] = useState(false)
   // Reported to the nav the INSTANT the toggle is pressed, not when the eased
@@ -705,7 +712,17 @@ export default function FeedSection({
               the screen centre — mid-zoom it tilts like lifting the phone
               toward your face, settling flat at both ends. */}
           {/* The phone itself — real geometry, real thickness, real lighting.
-              Its own canvas, projection-matched to the CSS rig below. */}
+              Its own canvas, projection-matched to the CSS rig below.
+              MOUNTED ONLY WHEN NEAR. Every scene section used to keep its own
+              WebGL context alive at all times — five devices plus the hero's
+              lanyard, six live contexts. Opening a project's detail mounts three
+              more (the report reel's device cards), and a browser only allows a
+              handful per page: at nine, Chrome silently killed the three oldest,
+              which is why coming back from a detail page found the laptop gone
+              (measured: 3 × "THREE.WebGLRenderer: Context Lost", 0 restored).
+              A section two pages away has nothing to show, so it holds no
+              context — and the model remounts as it comes back into range. */}
+          {Math.abs(offset) <= 1 && !detailOpen && (
           <DeviceModel
             cx={cx}
             cy={cy}
@@ -722,6 +739,7 @@ export default function FeedSection({
             vh={vh}
             persp={persp}
           />
+          )}
 
           {/* The screen rig — glass, cover art, live app — sits ABOVE the model's
               canvas (z-20), which is what keeps the device's Dynamic Island off

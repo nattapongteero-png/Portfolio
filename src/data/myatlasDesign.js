@@ -3,18 +3,35 @@
 // (ma-hifi-*-390.webp, 780×1688 = 390×844 at 2x; measured px row ÷ 2).
 // Shapes follow Pawmely's blocks in src/data/mockData.js.
 
-// The face the app ships. Read off lib/core/theme/app_typography.dart:
-// every style is GoogleFonts.dmSans(...) with 'DM Sans' as the declared
-// fallback family (pubspec: google_fonts ^8.0.2). DM Sans has no Thai
-// glyphs, so Thai text falls back to the system Thai face — the spec
-// itself names only DM Sans, so that is what the specimen shows.
+// The face the app SHIPS, read off the deployed build's own font bundle —
+// assets/FontManifest.json plus the font-picker table compiled into
+// main.dart.js. NOT off the local clone: that clone is months behind (its
+// gh-pages is a 2026-04-21 deploy, the live main.dart.js is 17 Aug) and its
+// theme still calls GoogleFonts.dmSans. "DM Sans" appears ZERO times in the
+// shipped bundle — printing it here was wrong, and the owner said so.
+//
+// What ships: the app's default pairing is `ibmNunito` —
+//   fontFamily: 'Nunito'  ·  fontFamilyFallback: ['IBM Plex Sans Thai Looped']
+// and the Nunito asset is NunitoNum.ttf, a 17 KB numerals-only subset against
+// IBM Plex's 125 KB regular. So Nunito sets the DIGITS and every letter and
+// Thai glyph falls through to IBM Plex Sans Thai Looped. The Display settings
+// also let the reader swap the text face to Sukhumvit Set, Google Sans,
+// Sarabun or Noto Sans Thai — all four keep IBM Plex Sans Thai Looped as their
+// Thai baseline.
+//
+// The SIZE/WEIGHT table below still comes from lib/core/theme/
+// app_typography.dart in the clone, so it describes the scale as authored;
+// the shipped build may have moved on.
+//
 // `metrics` omitted: the font file was not measured, so no number is printed.
+// Line-heights are in the source (1.20 → 1.36 down the scale) but the specimen
+// has no column for them, so they are not invented into one.
 export const myatlasTypography = {
   tone: '#1D8B6B',
-  latin: 'DM Sans',
-  thai: 'DM Sans + ฟอนต์ไทยของระบบ',
-  classification: 'Sans-serif · Geometric',
-  note: 'สเกลตัวอักษรตั้งตามชุด iOS ทั้งหมด 11 ขั้น อ่านจาก app_typography.dart ตรง ๆ — DM Sans คุมเลขและละติน ส่วนตัวไทยปล่อยให้ฟอนต์ระบบรับช่วง เพราะซอร์สประกาศไว้แค่ตระกูลเดียว',
+  latin: 'IBM Plex Sans Thai Looped',
+  thai: 'IBM Plex Sans Thai Looped',
+  classification: 'Looped Thai · ตัวเลขใช้ Nunito',
+  note: 'ตัวหนังสือทั้งแอปเป็น IBM Plex Sans Thai Looped ส่วนตัวเลขแยกไปใช้ Nunito — ไฟล์ที่ฝังมาเป็น NunitoNum.ttf ที่มีแต่ตัวเลขอย่างเดียว (17 KB) ตัวอักษรทุกตัวจึงตกมาที่ IBM Plex เสมอ เป็นคู่ฟอนต์ค่าเริ่มต้นที่อ่านจากบันเดิลของบิลด์จริง และในหน้าตั้งค่ายังสลับตัวอักษรได้อีกสี่แบบ — Sukhumvit Set, Google Sans, Sarabun, Noto Sans Thai — ซึ่งทุกแบบยังคง IBM Plex Sans Thai Looped ไว้เป็นฐานของตัวไทย ส่วนสเกลด้านล่างอ่านจาก app_typography.dart ทั้ง 11 ขั้น และยังมีอีกสองขนาดนอกตาราง คือ 21/400 ของตัวเลือกวันเวลา และ 10/500 ของป้ายแท็บ',
   // Weights actually used across app_typography.dart + app_theme.dart:
   // w400, w500 (tabLabel 10/500 in app_theme.dart), w600, w700.
   weights: [

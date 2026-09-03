@@ -167,24 +167,43 @@ const MM_SYSTEM = {
         },
         typography: {
           tone: '#319754',
-          latin: 'System (San Francisco / Roboto)',
+          latin: 'IBM Plex Sans Thai Looped',
           thai: 'IBM Plex Sans Thai Looped',
-          classification: 'System sans · Looped Thai สำหรับหัวเรื่อง',
-          note: 'ตัวหลักใช้ฟอนต์ระบบเพื่อให้ตัวไทยเรนเดอร์ตามเครื่องผู้ใช้และไม่ต้องแบกไฟล์ฟอนต์ ส่วน IBM Plex Sans Thai Looped ที่เป็นฟอนต์แบรนด์จากฝั่งเว็บโหลดเฉพาะน้ำหนัก Medium กับ Bold ไว้ใช้กับหัวเรื่อง — วัดจากบิลด์จริง ข้อความ 831 จุดเป็นฟอนต์ระบบ และ 6 จุดเป็น IBM Plex',
+          classification: 'Sans-serif · Looped Thai',
+          // The FONT is the app's own: guidelines/Guidelines.md names IBM Plex
+          // Sans Thai Looped the primary family, tailwind.config.js aliases it
+          // as `thai`, and App.tsx loads its four weights and patches Text to
+          // apply them app-wide. An earlier version of this block printed the
+          // SYSTEM font here because that is what the web export renders —
+          // which described a bug, not the design. The caveat now lives in the
+          // note, where it belongs.
+          //
+          // SIZES were re-measured on the public build (viewport 430×932,
+          // computed styles of all 1,420 visible text nodes on the home tab);
+          // the earlier table named three weights the build never renders.
+          note: 'ฟอนต์ของแอปคือ IBM Plex Sans Thai Looped ทั้งชุด โหลดไว้สี่น้ำหนักและตั้งเป็นค่าเริ่มต้นของทุกข้อความ ตามที่ไกด์ไลน์ของโปรเจกต์กำหนดไว้เป็นฟอนต์หลัก — บนบิลด์เว็บที่กดเล่นได้ในพอร์ตนี้ตัวแพตช์ไม่ทำงาน (react-native-web ห่อ Text ชั้นนอกด้วย context provider สไตล์เลยไม่ลงถึงตัวอักษร) ข้อความจึงเรนเดอร์ด้วยฟอนต์ระบบแทน 1,664 จาก 1,666 จุด เหลือ IBM Plex แค่ป้าย "รุ่นแรก" ที่เป็น Text ซ้อนชั้น — ขนาดและน้ำหนักด้านล่างวัดจากบิลด์นั้น จึงตรงตามที่ออกแบบ ต่างแค่หน้าตาของตัวอักษร',
           weights: [
             { name: 'Regular', value: 400 },
             { name: 'Medium', value: 500 },
             { name: 'SemiBold', value: 600 },
             { name: 'Bold', value: 700 },
+            // Not in the guideline, but the build uses it — heavily on the cafe
+            // screens and on a handful of home badges.
+            { name: 'ExtraBold', value: 800 },
           ],
+          // Every row below was counted on the live build; the count is how
+          // many nodes render at that size AND weight.
           scale: [
-            { role: 'Section heading', token: 'heading/20', px: 20, weight: 500, usage: 'หัวข้อโซน' },
-            { role: 'Screen title', token: 'title/18', px: 18, weight: 700, usage: 'ชื่อหน้าจอ' },
-            { role: 'Body', token: 'body/14', px: 14, weight: 400, usage: 'เนื้อความ · ชื่อการ์ด' },
-            { role: 'Sub', token: 'sub/13', px: 13, weight: 400, usage: 'บรรทัดรอง' },
-            { role: 'Caption', token: 'caption/12', px: 12, weight: 400, usage: 'คำบรรยาย' },
-            { role: 'Meta', token: 'meta/11', px: 11, weight: 400, usage: 'เรตติ้ง · ยอดขาย · ป้าย' },
-            { role: 'Micro', token: 'micro/10', px: 10, weight: 700, usage: 'ตัวเลขนับถอยหลัง · ป้ายเล็ก' },
+            { role: 'Section heading', token: 'heading/20', px: 20, weight: 500, usage: 'หัวข้อโซนบนหน้าแรก · 7 จุด' },
+            { role: 'Screen title', token: 'title/18', px: 18, weight: 700, usage: 'ชื่อหน้าและชื่อแบรนด์บนหัวเพจ' },
+            { role: 'Wholesale price', token: 'price/16', px: 16, weight: 700, usage: 'ราคาต่อกิโลกรัมในตลาดสมุนไพร · 44 จุด' },
+            { role: 'Card price', token: 'price/14', px: 14, weight: 600, usage: 'ราคาบนการ์ดสินค้า · 43 จุด' },
+            { role: 'Card name', token: 'name/14', px: 14, weight: 500, usage: 'ชื่อสินค้าบนการ์ด · 16 จุด' },
+            { role: 'Button / MOQ', token: 'action/13', px: 13, weight: 600, usage: 'ป้ายปุ่มและค่ากำกับอย่าง MOQ · 88 จุด' },
+            { role: 'Caption', token: 'caption/12', px: 12, weight: 400, usage: 'ชื่อร้าน · คำบรรยายสินค้า · 174 จุด' },
+            { role: 'Meta', token: 'meta/11', px: 11, weight: 400, usage: 'ป้ายเล็กและข้อมูลรอง · 340 จุด' },
+            { role: 'Rating & sold', token: 'micro/10', px: 10, weight: 400, usage: 'เรตติ้งและยอดขายบนการ์ด · 286 จุด' },
+            { role: 'Countdown', token: 'countdown/10', px: 10, weight: 700, usage: 'ตัวเลขนับถอยหลัง Flash Sale · 25 จุด' },
           ],
         },
         color: {
@@ -1149,23 +1168,37 @@ export const projects = [
           latin: 'IBM Plex Sans Thai Looped',
           thai: 'IBM Plex Sans Thai Looped',
           classification: 'Sans-serif · Looped Thai',
-          note: 'ทั้งบิลด์เดินด้วยตระกูลเดียว — วัดจากทุก element ที่มองเห็นบนหน้า /market พบ IBM Plex Sans Thai Looped 211 จุด ไม่มีตระกูลอื่นปน',
+          note: 'ทั้งบิลด์เดินด้วยตระกูลเดียว — วัดจากทุก element ที่มองเห็นบนหน้า /market พบ IBM Plex Sans Thai Looped ครบทั้ง 739 จุด (214 จุดที่มีข้อความ) ไม่มีตระกูลอื่นปนแม้แต่จุดเดียว',
           weights: [
             { name: 'Regular', value: 400 },
             { name: 'Medium', value: 500 },
             { name: 'SemiBold', value: 600 },
             { name: 'Bold', value: 700 },
           ],
+          // Measured in-page with canvas TextMetrics at 100px on the real face
+          // (x 0.516, H 0.698 — a control run against a missing family gives
+          // 0.523 / 0.717, so this is the loaded Plex, not a fallback).
           metrics: { xHeight: 0.52, capHeight: 0.7 },
-          // PROVENANCE: font-size counted across the live page —
-          // 10px x80 · 12px x27 · 13px x24 · 14px x20 · 18px x20 · 11px x20 · 20px x3
+          // PROVENANCE — every row below is a size AND weight counted on the
+          // live page, with the element it belongs to named in `usage`. The
+          // first cut of this table was wrong in four rows: it published the
+          // title at 700 (it renders 500), a section row at 18/600 that does
+          // not exist on /market (18px there is the price, at 700), the price
+          // at 14/700 (14px is the product name, at 600), and the product name
+          // as 13/400 body (13px is the MOQ figure, at 600).
+          // The market card grid: 20/500 · 14/600 · 18/700 · 13/600 · 12/400 ·
+          // 11/500 · 10/400. The detail page runs its own larger set —
+          // 32/700 hero price, 24/600 page title, 20/600 and 18/600 headings,
+          // 13/400 spec rows — which is where the old 18/600 and 13/400 rows
+          // actually came from.
           scale: [
-            { role: 'Screen title', token: 'title/20', px: 20, weight: 700, usage: 'หัวข้อหน้าจอ' },
-            { role: 'Section title', token: 'section/18', px: 18, weight: 600, usage: 'หัวข้อกลุ่มสินค้า' },
-            { role: 'Price', token: 'price/14', px: 14, weight: 700, usage: 'ราคาต่อกิโลกรัม' },
-            { role: 'Body', token: 'body/13', px: 13, weight: 400, usage: 'ชื่อวัตถุดิบ · เนื้อความ' },
-            { role: 'Caption', token: 'caption/12', px: 12, weight: 400, usage: 'ชื่อร้าน · คำบรรยาย' },
-            { role: 'Meta', token: 'meta/10', px: 10, weight: 400, usage: 'MOQ · สต็อก · ป้ายเล็ก' },
+            { role: 'Screen title', token: 'title/20', px: 20, weight: 500, usage: 'หัวข้อหน้า — “ตลาดวัตถุดิบสมุนไพร”' },
+            { role: 'Card price', token: 'price/18', px: 18, weight: 700, usage: 'ราคาบนการ์ด · 20 จุด (ใบละหนึ่ง)' },
+            { role: 'Product name', token: 'name/14', px: 14, weight: 600, usage: 'ชื่อวัตถุดิบบนการ์ด · 20 จุด' },
+            { role: 'MOQ value', token: 'moq/13', px: 13, weight: 600, usage: 'ตัวเลขยอดสั่งขั้นต่ำใต้ป้าย MOQ · 22 จุด' },
+            { role: 'Shop name', token: 'caption/12', px: 12, weight: 400, usage: 'ชื่อร้านผู้ขาย · 23 จุด' },
+            { role: 'Rating', token: 'rating/11', px: 11, weight: 500, usage: 'คะแนนรีวิวบนการ์ด · 20 จุด' },
+            { role: 'Meta', token: 'meta/10', px: 10, weight: 400, usage: 'ป้าย MOQ · ราคา/กก. · คงเหลือ · ขายแล้ว · 80 จุด' },
           ],
         },
         color: {
@@ -1689,6 +1722,35 @@ export const projects = [
           { id: 'hifi', label: 'Hi-fi', color: '#267a43', art: 'shot' },
         ],
         ...MM_SYSTEM,
+        // The cafe ships inside the same app, but its TYPE is its own — measured
+        // on the live build, the cafe screens share only 11/400, 12/400 and 13px
+        // with the home tab, lean on a weight (800) the rest of the app barely
+        // uses, and add sizes (9.5 / 15.5 / 19) that appear nowhere else. So the
+        // colour, grid and component pages come from MM_SYSTEM above, and this
+        // one page states what the cafe actually renders.
+        typography: {
+          tone: '#319754',
+          latin: 'IBM Plex Sans Thai Looped',
+          thai: 'IBM Plex Sans Thai Looped',
+          classification: 'Sans-serif · Looped Thai · น้ำหนักหนาเป็นตัวนำ',
+          note: 'ใช้ฟอนต์เดียวกับทั้งแอปคือ IBM Plex Sans Thai Looped — ไม่มีหน้าคาเฟ่ไหนตั้งฟอนต์เองเลยสักจอ สิ่งที่ต่างจากส่วนอื่นคือน้ำหนัก: คาเฟ่ยืนด้วย ExtraBold 800 เป็นตัวนำ ทั้งราคา หัวข้อโซน และป้ายอันดับ คิดเป็น 30% ของข้อความในโซนนี้ เทียบกับ 11% ของทั้งแอป — และ 800 เป็นน้ำหนักที่ไกด์ไลน์ไม่ได้กำหนดไว้ (กำหนดถึง 700) ทั้งยังไม่มีไฟล์ฟอนต์รองรับ เบราว์เซอร์จึงหนาให้เองแบบสังเคราะห์',
+          weights: [
+            { name: 'Regular', value: 400 },
+            { name: 'SemiBold', value: 600 },
+            { name: 'Bold', value: 700 },
+            { name: 'ExtraBold', value: 800 },
+          ],
+          scale: [
+            { role: 'Screen title', token: 'title/20', px: 20, weight: 800, usage: 'ชื่อร้าน — “METAHERB Café”' },
+            { role: 'Banner title', token: 'banner/19', px: 19, weight: 700, usage: 'หัวแบนเนอร์โปรโมชัน' },
+            { role: 'Section heading', token: 'heading/15.5', px: 15.5, weight: 800, usage: 'หัวข้อโซนเมนู · 7 จุด' },
+            { role: 'Price', token: 'price/14', px: 14, weight: 800, usage: 'ราคาเมนู · 66 จุด' },
+            { role: 'Menu name', token: 'name/13', px: 13, weight: 600, usage: 'ชื่อเมนู · 66 จุด' },
+            { role: 'Caption', token: 'caption/12', px: 12, weight: 400, usage: 'คำบรรยายเมนู · 14 จุด' },
+            { role: 'Meta', token: 'meta/11', px: 11, weight: 400, usage: 'บรรทัดรอง เช่น เย็น · กาแฟสดคั่วพิเศษ · 66 จุด' },
+            { role: 'Rank badge', token: 'rank/9.5', px: 9.5, weight: 800, usage: 'ป้ายอันดับบนการ์ดเมนูฮิต · 24 จุด' },
+          ],
+        },
         wireframe: cafeWireframe,
         hifi: {
           container: { screen: 430, height: 932 },

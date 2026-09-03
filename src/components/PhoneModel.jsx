@@ -19,6 +19,7 @@
 
 import { Suspense, useMemo } from 'react'
 import { Canvas } from '@react-three/fiber'
+import useGLRecover from '../hooks/useGLRecover'
 import { useGLTF, Environment } from '@react-three/drei'
 
 const GLB = `${import.meta.env.BASE_URL}iphone_17_pro_max_silver.glb`
@@ -97,6 +98,8 @@ export function Phone({ screenW, swingY = 0 }) {
 }
 
 export default function PhoneModel({ cx, cy, screenW, swingY, opacity = 1, vw, vh }) {
+  // Survives a lost WebGL context — see useGLRecover.
+  const { canvasKey, onCreated } = useGLRecover()
   const fov = (2 * Math.atan(vh / 2 / PERSPECTIVE) * 180) / Math.PI
   return (
     <div
@@ -104,6 +107,8 @@ export default function PhoneModel({ cx, cy, screenW, swingY, opacity = 1, vw, v
       style={{ opacity, visibility: opacity <= 0 ? 'hidden' : 'visible' }}
     >
       <Canvas
+        key={canvasKey}
+        onCreated={onCreated}
         // Render on demand: there is no useFrame in the scene, so a frame is only
         // needed when a prop changes (the phone's swing, a resize, an asset
         // finishing load). R3F invalidates on those automatically. This stops the

@@ -18,6 +18,7 @@
 
 import { Suspense, useMemo } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
+import useGLRecover from '../hooks/useGLRecover'
 import { useGLTF, Environment } from '@react-three/drei'
 
 const GLB = `${import.meta.env.BASE_URL}macbook_pro_m3_16.glb`
@@ -105,6 +106,8 @@ function CameraRig({ persp, vh }) {
 }
 
 export default function MacModel({ cx, cy, screenW, swingY = 0, vw, vh, opacity = 1, persp = PERSPECTIVE }) {
+  // Survives a lost WebGL context — see useGLRecover.
+  const { canvasKey, onCreated } = useGLRecover()
   const fov = (2 * Math.atan(vh / 2 / persp) * 180) / Math.PI
   return (
     <div
@@ -112,6 +115,8 @@ export default function MacModel({ cx, cy, screenW, swingY = 0, vw, vh, opacity 
       style={{ opacity, visibility: opacity <= 0 ? 'hidden' : 'visible' }}
     >
       <Canvas
+        key={canvasKey}
+        onCreated={onCreated}
         frameloop="demand"
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
