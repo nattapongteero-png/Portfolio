@@ -15,6 +15,20 @@ import PageHead from './PageHead'
 import { requestReveal, useReveal } from '../lib/reveal'
 import { ArrowLeft } from 'lucide-react'
 import { PAWMELY_KIT } from './PawmelyKit'
+import { METAHERB_KIT } from './MetaherbKit'
+import { MM_KIT } from './MMKit'
+import { MYATLAS_KIT } from './MyAtlasKit'
+
+// Every project's component page mounts ITS OWN live kit — each one rebuilt
+// from that app's real tokens and screens, the way PawmelyKit was. Pawmely's
+// kit is keyed by preview `kind`; the newer kits key by the item's exact name,
+// because their sets reuse kinds (two inputs, three cards) that would collide.
+const KITS = {
+  pawmely: PAWMELY_KIT,
+  metaherb: METAHERB_KIT,
+  mm: MM_KIT,
+  myatlas: MYATLAS_KIT,
+}
 import PhoneFrames from './PhoneFrames'
 import MacFrame from './MacFrame'
 import ClampText from './ClampText'
@@ -1070,7 +1084,11 @@ const inkOn = (hex) => (contrast(hex, '#FFFFFF') >= 3 ? '#FFFFFF' : '#1A1A1A')
 const ROSE = '#9F5266'
 const ROSE_SOFT = '#CC8796'
 const OCEAN = '#2C6E8C'
-function CompPreview({ kind }) {
+// Tinted with the OWNING project's tone: the silhouettes are shared shapes,
+// but a Metaherb specimen drawn in Pawmely rose read as Pawmely's component.
+function CompPreview({ kind, tone }) {
+  const ROSE = tone ?? '#9F5266'
+  const ROSE_SOFT = tone ? `${tone}B3` : '#CC8796'
   switch (kind) {
     case 'button':
       return (
@@ -1269,7 +1287,9 @@ function ComponentSpecimen({ top, data }) {
               its own specimens should not look like it changes size. */}
           <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2">
             {data.items.map((it) => {
-              const Live = PAWMELY_KIT[it.kind]
+              // Name first (the newer kits), kind as the fallback (Pawmely's).
+              const kit = KITS[data.kit]
+              const Live = kit ? (kit[it.name] ?? kit[it.kind]) : null
               return (
               <div
                 key={it.name}
@@ -1290,7 +1310,15 @@ function ComponentSpecimen({ top, data }) {
                     tinted surface under them put more weight on the page than
                     the components. One hairline is enough of an edge. */}
                 <div className="grid h-[212px] shrink-0 place-items-center px-5 py-4">
-                  {Live ? <Live /> : <CompPreview kind={it.kind} />}
+                  {Live ? (
+                    <Live />
+                  ) : (
+                    // Scaled up from the card-jar size so the specimen fills
+                    // the same stage the live kit does.
+                    <div style={{ transform: 'scale(1.8)' }}>
+                      <CompPreview kind={it.kind} tone={data.tone} />
+                    </div>
+                  )}
                 </div>
                 {/* Name and description differ by INK, not by weight — the same
                     rule the report pages are set by. */}
@@ -2388,10 +2416,11 @@ export default function FeedSheet({ title, panels, onClose, startAt }) {
           panel starts at the sheet's own left edge; the shell's max-width would
           push the button off the card on wide screens. Every panel carries a
           matching `pt-24` so the title always clears it. */}
-      {/* Measured to land on the SAME rect as the back button on the project
-          profile and on the project stage — 36 / 60 at md. It sat at 28 / 28,
-          which made it the one control on the site that moved when the page did. */}
-      <div className="pointer-events-none absolute left-4 top-6 z-20 md:left-9 md:top-[60px]">
+      {/* Measured to land on the SAME rect as the shared BackButton on the
+          project profile — 32 / 37 at md (left-8, centred on the 72px heading).
+          It sat at 36 / 60 from an older measurement, which made it the one
+          control on the site that moved when the page did. */}
+      <div className="pointer-events-none absolute left-4 top-5 z-20 md:left-8 md:top-[37px]">
         <button
           onClick={close}
           aria-label="back"

@@ -388,6 +388,17 @@ export default function FeedSection({
     animateTo(1, 1100)
   }
   const openProto = useCallback(() => openFnRef.current?.(), [])
+  // Leaving the page closes its prototype. Changing project while the app was
+  // focused left this section's zoom state where it was, so coming BACK landed
+  // on a screen still stuck in the played state. The swap happens under the
+  // arc curtain, so the reset is instant — no close animation to see.
+  useEffect(() => {
+    if (!protoOpen || Math.abs(offset) < 0.5) return
+    setProtoOpen(false)
+    cancelAnimationFrame(animRef.current)
+    focusRef.current = 0
+    setFocus(0)
+  }, [offset, protoOpen])
   // Reported on mount as well as on every toggle, so the nav can show the crumb
   // for a section that HAS a prototype even while it is closed. Guarded to
   // sections that actually own one: every section runs this effect, so without
@@ -878,23 +889,23 @@ export default function FeedSection({
                   overscrollBehavior: 'contain',
                 }}
               >
-                {/* The app is laid out at the device's OWN size — 390×844, the
-                    viewport it was designed against — and then scaled to
-                    whatever the model's screen currently measures. Sizing the
-                    iframe to the model instead made Flutter re-run its layout
-                    at that width, so shrinking the mockup reflowed the app:
-                    text wrapped to more lines and cards changed height. Scaling
-                    keeps the prototype identical to the real phone at every
-                    model size. */}
+                {/* The app is laid out at the viewport it was DESIGNED against
+                    — the device's default (390×844), or the project's own
+                    `appViewport` when it targets another canvas: Metaherb
+                    Mobile draws at 430×932, and laying it out at 390 cut its
+                    right edge off inside the frame. Then it is only scaled to
+                    whatever the model's screen currently measures — sizing the
+                    iframe to the model instead made the app re-run its layout
+                    at that width, so shrinking the mockup reflowed it. */}
                 <iframe
                   src={info.prototypeUrl}
                   title={`${info.title ?? ''} UI Prototype`.trim()}
                   onLoad={() => setAppReady(true)}
                   className="block border-0"
                   style={{
-                    width: dev.app.w,
-                    height: dev.app.h,
-                    transform: `scale(${winWFocus / dev.app.w})`,
+                    width: (info.appViewport ?? dev.app).w,
+                    height: (info.appViewport ?? dev.app).h,
+                    transform: `scale(${winWFocus / (info.appViewport ?? dev.app).w})`,
                     transformOrigin: 'top left',
                   }}
                   allow="clipboard-write; fullscreen"
@@ -1030,8 +1041,11 @@ export default function FeedSection({
                 />
               )}
               {/* The play button closes the column, back at the bottom where it
-                  was — the one thing the description shifts when it expands. */}
-              {!isNarrow && protoToggle}
+                  was — the one thing the description shifts when it expands.
+                  Only when there is a prototype to play: MyAtlas stages its
+                  device while its link is still on its way, and a play button
+                  with nothing behind it is a broken promise. */}
+              {!isNarrow && info.prototypeUrl && protoToggle}
             </div>
           )}
 
@@ -1088,8 +1102,8 @@ export default function FeedSection({
           {/* The toggle on a phone: under the device, positioned against the
               section rather than the viewport. `fixed` put it outside the
               section entirely, so it hung over every other page of the feed as
-              you scrolled past. */}
-          {isNarrow && info && (
+              you scrolled past. Only when there is a prototype to play. */}
+          {isNarrow && info?.prototypeUrl && (
             <div
               // The expanded description's blur band reaches up over this spot.
               // Dropping BELOW the caption layer (z-[12]) puts the toggle behind

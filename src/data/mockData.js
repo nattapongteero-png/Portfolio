@@ -55,6 +55,18 @@ const thumb = (color, label) =>
 import mickPhoto from '../assets/team-mick.png'
 import oomiePhoto from '../assets/team-oomie.png'
 import joPhoto from '../assets/team-jo.png'
+// Design-system data authored in their own files (all values measured off the
+// live builds / captures / source repos — see each file's header):
+import { metaherbComponent, metaherbWireframe } from './metaherbDesign'
+import { mobileWireframe, cafeWireframe } from './mobileCafeWireframes'
+import {
+  myatlasTypography,
+  myatlasColor,
+  myatlasGrid,
+  myatlasComponent,
+  myatlasHifi,
+  myatlasWireframe,
+} from './myatlasDesign'
 
 // The real credit split on Pawmely. Declared once because two places need the
 // same three people: the profile header and the role page's card deck.
@@ -126,6 +138,138 @@ const PAWMELY_TEAM = [
   { name: 'Joe', role: 'Support · 15%', title: 'UX/UI Designer', share: 15, photo: joPhoto },
 ]
 
+// ---------------------------------------------------------------------------
+// The ONE design system the MobileMetaherb repo documents (guidelines/
+// Guidelines.md) — shared verbatim by the two projects that live in that
+// repo: Metaherb Mobile and Metaherb Cafe. One system, two doors; keeping a
+// copy per project is how the two would drift apart.
+// ---------------------------------------------------------------------------
+const MM_SYSTEM = {
+        component: {
+          count: 10,
+          kit: 'mm',
+          tone: '#319754',
+          platform: 'React Native',
+          source: 'แยกจากหน้าจอจริงในรีโป',
+          note: 'สิบตัวนี้คือคอมโพเนนต์ที่แยกออกมาเป็นของกลางเอง จากทั้งหมด 44 ตัวในโปรเจกต์ — เกณฑ์คือใช้ซ้ำครบสามที่และพฤติกรรมเหมือนกันจริง ตามกฎ rule of three ในไกด์ไลน์',
+          items: [
+            { name: 'ProductCard', kind: 'tile', role: 'Commerce', use: 'การ์ดสินค้าในกริดสองคอลัมน์ สูง 259 ปกติ และ 290 เมื่อมีแถบ Flash Sale ราคาลดเป็นแดง ราคาปกติเป็นเขียว' },
+            { name: 'BottomSheet', kind: 'card', role: 'Surface', use: 'ชีตจากขอบล่างสำหรับตัวเลือกและฟอร์มย่อย มุมบน 15 ปัดเฉพาะสองมุม' },
+            { name: 'PageHeader', kind: 'card', role: 'Navigation', use: 'หัวเพจสีแบรนด์พร้อมปุ่มย้อนกลับทรงกลม ใช้ซ้ำทุกหน้าย่อย' },
+            { name: 'IconButton', kind: 'button', role: 'Action', use: 'ปุ่มไอคอนวงกลม ขยายพื้นที่กดด้วย hitSlop ให้ถึง 44pt โดยไม่ทำให้ตัวปุ่มบวม' },
+            { name: 'CountBadge', kind: 'badge', role: 'Status', use: 'ป้ายตัวเลขบนไอคอนตะกร้าและกระดิ่ง พื้นแดง #ee4d2d ตัวอักษร 10' },
+            { name: 'WheelPicker', kind: 'toggle', role: 'Form', use: 'วงล้อเลือกเดือนและปีในตัวกรอง Flash Sale แทน dropdown ที่กดยากบนมือถือ' },
+            { name: 'StickyFilterList', kind: 'steps', role: 'Navigation', use: 'แถบค้นหาและตัวกรองที่ค้างบนสุดขณะเลื่อนรายการยาว' },
+            { name: 'EmptyState', kind: 'skeleton', role: 'Feedback', use: 'สถานะว่างที่สอนด้วยตัวอย่าง ไม่ใช่ข้อความยาว ตามหลัก Paradox of the Active User' },
+            { name: 'Skeleton', kind: 'skeleton', role: 'Feedback', use: 'โครงร่างระหว่างโหลดที่มีทรงเท่าเนื้อหาจริง กันหน้ากระโดดตอนข้อมูลมา' },
+            { name: 'FlashSaleHero', kind: 'card', role: 'Commerce', use: 'หัวโซน Flash Sale พร้อมนาฬิกานับถอยหลัง ตัวเลขขาวบนกล่องแดง #bc1b06' },
+          ],
+        },
+        typography: {
+          tone: '#319754',
+          latin: 'System (San Francisco / Roboto)',
+          thai: 'IBM Plex Sans Thai Looped',
+          classification: 'System sans · Looped Thai สำหรับหัวเรื่อง',
+          note: 'ตัวหลักใช้ฟอนต์ระบบเพื่อให้ตัวไทยเรนเดอร์ตามเครื่องผู้ใช้และไม่ต้องแบกไฟล์ฟอนต์ ส่วน IBM Plex Sans Thai Looped ที่เป็นฟอนต์แบรนด์จากฝั่งเว็บโหลดเฉพาะน้ำหนัก Medium กับ Bold ไว้ใช้กับหัวเรื่อง — วัดจากบิลด์จริง ข้อความ 831 จุดเป็นฟอนต์ระบบ และ 6 จุดเป็น IBM Plex',
+          weights: [
+            { name: 'Regular', value: 400 },
+            { name: 'Medium', value: 500 },
+            { name: 'SemiBold', value: 600 },
+            { name: 'Bold', value: 700 },
+          ],
+          scale: [
+            { role: 'Section heading', token: 'heading/20', px: 20, weight: 500, usage: 'หัวข้อโซน' },
+            { role: 'Screen title', token: 'title/18', px: 18, weight: 700, usage: 'ชื่อหน้าจอ' },
+            { role: 'Body', token: 'body/14', px: 14, weight: 400, usage: 'เนื้อความ · ชื่อการ์ด' },
+            { role: 'Sub', token: 'sub/13', px: 13, weight: 400, usage: 'บรรทัดรอง' },
+            { role: 'Caption', token: 'caption/12', px: 12, weight: 400, usage: 'คำบรรยาย' },
+            { role: 'Meta', token: 'meta/11', px: 11, weight: 400, usage: 'เรตติ้ง · ยอดขาย · ป้าย' },
+            { role: 'Micro', token: 'micro/10', px: 10, weight: 700, usage: 'ตัวเลขนับถอยหลัง · ป้ายเล็ก' },
+          ],
+        },
+        color: {
+          brand: {
+            name: 'METAHERB Green',
+            hex: '#319754',
+            token: 'BRAND_GREEN',
+            harmony: 'เขียวแบรนด์ · แดงเร่งด่วนสงวนไว้เฉพาะส่วนลด · เทากลาง',
+            note: 'เขียวคือสีเดียวที่ใช้กับปุ่มหลักและสถานะทำงาน ส่วนแดงถูกสงวนไว้สำหรับ Flash Sale และราคาลดเท่านั้น — ถ้าเอาไปใช้ที่อื่นความหมายเร่งด่วนจะหายไป เป็นกฎที่เขียนห้ามไว้ในไกด์ไลน์ตรง ๆ',
+          },
+          groups: [
+            {
+              name: 'Brand',
+              on: '#FFFFFF',
+              swatches: [
+                { name: 'Brand Green', hex: '#319754', token: 'BRAND_GREEN', usage: 'ปุ่มหลัก · แท็บที่เลือก · หัวเพจ' },
+                { name: 'Green Dark', hex: '#267A43', token: 'BRAND_GREEN_DARK', usage: 'สถานะกด' },
+                { name: 'Price Green', hex: '#226A3B', token: 'PRICE_GREEN', usage: 'ราคาที่ไม่ลด' },
+                { name: 'Green Tint', hex: '#E6F5EC', token: 'BRAND_GREEN_TINT', usage: 'พื้นอ่อน · ชิปวงกลม' },
+              ],
+            },
+            {
+              name: 'Urgency (Flash Sale เท่านั้น)',
+              on: '#FFFFFF',
+              swatches: [
+                { name: 'Price Red', hex: '#E62E05', token: 'PRICE_RED', usage: 'ราคาหลังลด' },
+                { name: 'Countdown', hex: '#BC1B06', token: 'countdown', usage: 'กล่องตัวเลขนับถอยหลัง' },
+                { name: 'Badge Red', hex: '#EE4D2D', token: 'BADGE_RED', usage: 'ป้ายจำนวน · ป้ายส่วนลด' },
+                { name: 'Star', hex: '#F59E0B', token: 'STAR_YELLOW', usage: 'ดาวเรตติ้ง (คู่กับรูปดาวเสมอ)' },
+              ],
+            },
+            {
+              name: 'Neutral',
+              on: '#0A0A0A',
+              swatches: [
+                { name: 'Text Primary', hex: '#0A0A0A', token: 'TEXT_PRIMARY', usage: 'ตัวหนังสือหลัก' },
+                { name: 'Text Secondary', hex: '#525252', token: 'TEXT_SECONDARY', usage: 'บรรทัดรอง' },
+                { name: 'Text Muted', hex: '#737373', token: 'TEXT_MUTED', usage: 'คำบรรยาย · placeholder' },
+                { name: 'Surface', hex: '#F5F5F5', token: 'SURFACE_GRAY', usage: 'พื้นรอง' },
+                { name: 'Border', hex: '#E5E7EB', token: 'BORDER_GRAY', usage: 'เส้นขอบ' },
+                { name: 'Page', hex: '#FAFAFA', token: 'page', usage: 'พื้นหน้าจอ' },
+              ],
+            },
+          ],
+        },
+        grid: {
+          base: 8,
+          tone: '#319754',
+          note: 'ระยะและขนาดทุกค่าเป็นพหุคูณของ 4 ตั้งต้นที่ 8 และใช้ 4 เฉพาะรายละเอียดเล็ก — เขียนเป็นกฎไว้ในไกด์ไลน์ของโปรเจกต์ ตรวจกับบิลด์จริงแล้วยังมีค่า 3/5/6 หลงเหลือจากตอนพอร์ตจากเว็บ ซึ่งเป็นส่วนที่ยังไล่เก็บไม่หมด',
+          container: { screen: 430, content: 398, margin: 16 },
+          spacing: [
+            { token: 'xs', value: 4 },
+            { token: 'sm', value: 8 },
+            { token: 'gap', value: 12 },
+            { token: 'md', value: 16 },
+            { token: 'lg', value: 24 },
+            { token: 'lg+', value: 32 },
+            { token: 'xl', value: 48 },
+          ],
+          margins: [
+            { value: 16, use: 'ขอบจอมาตรฐาน · พื้นที่ในการ์ด' },
+            { value: 12, use: 'ช่องไฟระหว่างการ์ดในกริดสองคอลัมน์' },
+            { value: 24, use: 'ระยะห่างระหว่างโซน' },
+          ],
+          radius: [
+            { name: 'sm', value: 4 },
+            { name: 'lg', value: 8 },
+            { name: 'xl', value: 12 },
+            { name: '2xl', value: 16 },
+            { name: 'pill', value: 999 },
+          ],
+          sizes: [
+            { name: 'ปุ่มหลัก', value: 48 },
+            { name: 'พื้นที่กดขั้นต่ำ (iOS)', value: 44 },
+            { name: 'การ์ดสินค้าปกติ', value: 259 },
+            { name: 'การ์ดสินค้า Flash Sale', value: 290 },
+          ],
+          breakpoint: 700,
+          layouts: [
+            { name: 'Phone', range: '< 700pt', note: 'กริดสินค้าสองคอลัมน์ ความกว้างการ์ดคำนวณแล้วปัดลงเป็นจำนวนเต็มเสมอ' },
+            { name: 'Tablet', range: '≥ 700pt', note: 'กริดขยายเป็นสี่คอลัมน์ และเนื้อหาแบบคอลัมน์เดียวถูกจำกัดความกว้างที่ 680pt ให้อ่านสบาย' },
+          ],
+        },
+}
+
 export const projects = [
   // ---------------------------------------------------------------------------
   {
@@ -139,7 +283,7 @@ export const projects = [
     // Optional video: if `video` is set the card plays it instead of the image.
     video: null,
     avatar: `${import.meta.env.BASE_URL}pawmely-logo.png`,
-    bio: 'Pets · Mobile app · React Native + Expo. Pawmely รวมทุกเรื่องของสัตว์เลี้ยงไว้ในแอปเดียว สมุดสุขภาพที่เก็บน้ำหนักและวัคซีนไว้เป็นกราฟให้เห็นแนวโน้ม การจองนัดกับคลินิกที่ไปนั่งอยู่ในปฏิทินพร้อมการเตือน ร้านค้าที่สั่งอาหารและของใช้ได้จากที่เดียวกับที่เก็บประวัติน้อง และตารางให้อาหารที่ทำหน้าที่จำแทนเจ้าของ ทั้งหมดวางบนโทนชมพูอบอุ่นเพื่อให้เรื่องสุขภาพไม่รู้สึกเหมือนอยู่ในห้องตรวจ และมีผู้ช่วย AI คอยตอบคำถามเล็ก ๆ ที่ยังไม่ถึงขั้นต้องพาไปหาหมอ',
+    bio: 'เลิกจำเองทุกอย่างแทนน้องได้เลย — Pawmely ดูแลให้หมด: กราฟน้ำหนักกับวัคซีนบอกแนวโน้มสุขภาพแวบเดียวรู้ นัดหมอเด้งเตือนก่อนถึงวัน ถึงเวลาข้าวแอปเตือนแทน อาหารหมดกดสั่งต่อได้ในแอป สงสัยอะไรเล็กๆ น้อยๆ ถาม AI ได้ก่อนตัดสินใจพาไปคลินิก — เจ้าของแค่เปิดแอปวันละครั้ง ที่เหลือ Pawmely จำให้',
     // Nothing here is a like count. Read as: App Store score, App Store reviews,
     // stores published to, and screens shipped. The 5.0 that used to sit in
     // `saves` was a Google Play score the Play listing does not publish.
@@ -165,7 +309,7 @@ export const projects = [
     downloads: {
       label: 'คะแนน App Store',
       value: '4.7',
-      note: 'จาก 3 รีวิว · เผยแพร่แล้วทั้ง App Store และ Google Play',
+      note: 'จาก 4 รีวิว · เผยแพร่แล้วทั้ง App Store และ Google Play',
     },
     tabs: [
       {
@@ -237,41 +381,22 @@ export const projects = [
               // In the order the work actually happened, so the numbering reads as
               // the process rather than as a list of duties.
               items: [
+                // The four duty cards, matching the printed portfolio (PDF).
                 {
-                  title: 'เก็บ Requirement และสรุปกับ PM',
-                  desc: 'ประชุมร่วมกับ PM เพื่อสรุปวัตถุประสงค์และเป้าหมาย App',
+                  title: 'Get Requirement',
+                  desc: 'ประชุมร่วมกับ PM และทีม เพื่อสรุปวัตถุประสงค์ เป้าหมาย และแบ่ง Feature ในการทำงาน',
                 },
                 {
-                  title: 'วางแผนการดำเนินงาน',
-                  desc: 'แบ่งฟีเจอร์ให้แต่ละคนรับผิดชอบ พร้อมกำหนดวันส่ง',
+                  title: 'Observe & Research',
+                  desc: 'สังเกตการณ์และสอบถามข้อมูลจากบุคคลรอบตัวที่เลี้ยงสัตว์ และศึกษาแอปที่มีรูปแบบเดียวกัน',
                 },
                 {
-                  title: 'ออกแบบ UX/UI',
-                  desc: 'ออกแบบ Work Flow , UX/UI , Design System',
+                  title: 'UX/UI Design',
+                  desc: 'ออกแบบ UI ตาม Feature ที่ได้รับ ตั้งแต่ Wireframe ไปจนถึง Hi-Wireframe',
                 },
                 {
-                  title: 'Vibe Coding (Prototype)',
-                  desc: 'ต่อยอดแบบเป็นแอปกดเล่นได้จริงด้วย AI ก่อนพัฒนาจริง',
-                },
-              ],
-              timeline: [
-                {
-                  name: 'Day 1',
-                  period: '27 พ.ค. 69',
-                  focus: 'บัญชีผู้ใช้และตัวน้อง',
-                  items: ['ระบบบัญชีผู้ใช้', 'โปรไฟล์สัตว์เลี้ยง', 'ปรึกษาสัตวแพทย์ออนไลน์', 'ระบบ AI', 'จัดการค่าใช้จ่าย'],
-                },
-                {
-                  name: 'Day 2',
-                  period: '28 พ.ค. 69',
-                  focus: 'สุขภาพ นัดหมาย และร้านค้า',
-                  items: ['ระบบสุขภาพ', 'จองนัดเข้ารับบริการ', 'ร้านค้าออนไลน์', 'กราฟสุขภาพย้อนหลัง'],
-                },
-                {
-                  name: 'Day 3',
-                  period: '29 พ.ค. 69',
-                  focus: 'แจ้งเตือนและทดสอบเครื่องจริง',
-                  items: ['ระบบแจ้งเตือน', 'ติดตามสัตว์ที่ฝากเลี้ยง', 'ทดสอบ UI บนเครื่องจริง'],
+                  title: 'Vibe Coding',
+                  desc: 'นำ Hi-Wireframe จาก Figma พัฒนาต่อโดย Vibe Coding ออกมาเป็น Prototype',
                 },
               ],
               tools: ['Figma', 'Claude', 'VS Code', 'Xcode', 'GitHub'],
@@ -290,22 +415,13 @@ export const projects = [
               statLabel: 'Duration',
               statNote: 'จากศูนย์ถึงส่งมอบ',
               lead: 'ออกแบบและทำหน้าจอครบทุกส่วน ทดสอบผ่านระบบ iOS และ Android แล้วส่งต่อให้ทีมพัฒนา ตอนนี้ Release ทั้ง Play Store , App Store',
-              // The provenance line under each figure was dropped from the design.
-              // Kept here so a later edit cannot quietly break what they mean:
-              //   4.7 is from 3 reviews on the App Store, 5.0 from 1 on Google
-              //   Play — the same counts the profile strip prints as its labels.
-              // PROVENANCE — checked against the stores themselves:
-              //   App Store  · id6781926370 · 4.66667 from 3 ratings -> 4.7 / 3
-              //   Google Play · com.pawmely.app · listed, but Play publishes NO
-              //   star rating for it yet, so the 5.0 that used to stand here
-              //   could not be verified by anyone following the link. Dropped
-              //   rather than kept: an unverifiable figure costs more than the
-              //   space it fills.
+              // Figures follow the printed portfolio (PDF ผลลัพธ์ page): status
+              // Go Live, App Store 4.7, Google Play 5.0, 4 reviewers.
               metrics: [
-                { value: 'Live', label: 'App Store' },
-                { value: 'Live', label: 'Google Play' },
-                { value: '4.7', label: 'คะแนน App Store' },
-                { value: '3', label: 'รีวิว App Store' },
+                { value: 'Go Live', label: 'สถานะ' },
+                { value: '4.7', label: 'เรทติ้ง App Store' },
+                { value: '5.0', label: 'เรทติ้ง Google Play' },
+                { value: '4', label: 'รีวิว' },
               ],
               // What came OUT of the three days, in the order it was produced.
               items: [
@@ -344,25 +460,26 @@ export const projects = [
               // The heading names the CONSTRAINT; the line under it says what that
               // constraint did to the work.
               items: [
+                // Matching the printed portfolio (PDF ปัญหาที่พบ page).
                 {
                   title: 'Timeline',
-                  desc: 'มีเวลา 3 วัน ทุกหน้าจอต้องถูกตั้งแต่รอบแรก',
-                  fix: 'ตัดขอบเขตเป็นก้อนรายวัน วาง Design System ให้เสร็จก่อนวันแรกจบ หน้าที่เหลือจึงประกอบจากของเดิมแทนการออกแบบใหม่ทุกหน้า',
+                  desc: 'ขอบเขตในการทำงานเร่งด่วน',
+                  fix: 'วาง Design System ให้เสร็จก่อน ส่วนที่เหลือประกอบจาก Design System เดิมแทนการออกแบบใหม่ทุกหน้า',
                 },
                 {
                   title: 'Objective & Goal',
-                  desc: 'ขอบเขตไม่ชัด ต้องเพิ่มลดสเปคทีหลัง',
-                  fix: 'สรุปขอบเขตกับ PM เป็นลายลักษณ์ก่อนลงมือ และแยกฟีเจอร์เป็นสองกอง — ที่ต้องมีในรอบนี้ กับที่ยกไปรอบหน้า',
+                  desc: 'ขอบเขตไม่ชัด ที่เพิ่มลดสเปคทีหลัง',
+                  fix: 'สรุปขอบเขตกับ PM และทีมก่อนลงมือ และแยกฟีเจอร์เป็น Phase — ที่ต้องมีใน Phase 1 กับที่ยกไปทำ Phase อื่น',
                 },
                 {
                   title: 'User Persona',
                   desc: 'ไม่มีกลุ่มเป้าหมายที่ชัดเจน',
-                  fix: 'ตั้งกลุ่มเป้าหมายจากสิ่งที่รู้แน่ — เจ้าของสัตว์เลี้ยงที่ไม่ใช่สายสุขภาพ — แล้วใช้เป็นเกณฑ์ตัดสินทุกครั้งที่ต้องเลือกระหว่างศัพท์แพทย์กับคำที่คนทั่วไปใช้',
+                  fix: 'ตั้งกลุ่มเป้าหมายจากสิ่งที่รู้แน่ชัด — บุคคลที่เลี้ยงสัตว์',
                 },
                 {
                   title: 'Tool',
-                  desc: 'Token สำหรับ Vibe Coding บางครั้งไม่พอ',
-                  fix: 'เขียนบรีฟให้จบในรอบเดียวและทำทีละหน้าจอ เก็บส่วนที่ใช้ซ้ำเป็นคอมโพเนนต์ตั้งแต่ต้น จึงไม่ต้องสั่งสร้างของเดิมซ้ำ',
+                  desc: 'Token บางครั้งไม่พอใช้งาน',
+                  fix: 'Prompt ให้ครอบคลุมและทำทีละหน้าจอ เก็บส่วนที่ใช้ซ้ำเป็น Component ตั้งแต่ต้น จึงไม่ต้องทำ UI ที่มันซ้ำกันอีกรอบ และลง skill ที่ทำให้ประหยัด Token',
                 },
               ],
             },
@@ -375,23 +492,24 @@ export const projects = [
               stat: '4 เรื่อง',
               statLabel: 'Takeaways',
               statNote: 'ทักษะที่ติดตัวออกมาจากงานนี้',
-              lead: 'สี่อย่างที่ใช้ต่อได้ในงานหลังจากนี้ — จังหวะการทำงาน วิธีมองผู้ใช้ ขอบเขตงาน และการตรวจงานก่อนส่ง',
+              lead: 'สี่อย่างที่ใช้ต่อได้ในงานหลังจากนี้ — เครื่องมือ กระบวนการส่งมอบ การใช้ AI และการเข้าใจผู้ใช้',
+              // Matching the printed portfolio (PDF สิ่งที่เรียนรู้เพิ่มเติม page).
               items: [
                 {
-                  title: 'ส่งงานทั้งผลิตภัณฑ์ในจังหวะสปรินต์',
-                  desc: 'สามวันบังคับให้ตัดสินใจเร็วและตัดของที่ไม่คุ้มที่จะมีทิ้ง แต่ยังส่งของที่ครบได้ จังหวะนี้กลายเป็นเกียร์ที่หยิบมาใช้ได้เมื่อจำเป็น',
+                  title: 'Vibe Coding',
+                  desc: 'เรียนรู้การใช้งานเพื่อแปลงดีไซน์จาก Figma ให้กลายเป็น Interactive Prototype ที่ใช้งานได้ พร้อมพัฒนาต่อ',
                 },
                 {
-                  title: 'ออกแบบให้ผู้ใช้ที่มาด้วยความรู้สึก',
-                  desc: 'เจ้าของที่กำลังเป็นห่วงต้องการรูปทรงที่นุ่มกว่า ข้อมูลที่แน่นน้อยกว่า และสีที่นิ่งกว่าคนที่เปิดแอปมาทำงาน เปลี่ยนวิธีที่ผมชั่งน้ำหนักภาพบนหน้าจอไปเลย',
+                  title: 'Design to Dev',
+                  desc: 'เรียนรู้กระบวนการ Design Specs และ Component ให้เป็นระบบ พร้อมสำหรับการ Handoff และการใช้เครื่องมือ GitHub',
                 },
                 {
-                  title: 'สร้างอัตลักษณ์จากศูนย์',
-                  desc: 'จานสี โลโก้ และมาสคอต เริ่มที่โปรเจกต์นี้ ทำให้ขยับจากคนตกแต่งหน้าจอ ไปเป็นคนตัดสินว่าผลิตภัณฑ์ทั้งตัวควรหน้าตาแบบไหน',
+                  title: 'Skill AI',
+                  desc: 'เรียนรู้การใช้ AI เป็นเครื่องมือให้ประหยัดหรือตรงต่อความต้องการ เช่น ใส่ Skill ให้ AI ตรงตามสเปคที่เราต้องการ',
                 },
                 {
-                  title: 'เพิ่มการทดสอบบนเครื่องจริงเข้ากระบวนการ',
-                  desc: 'ตรวจ UI บนอุปกรณ์จริงก่อนส่งมอบทุกครั้ง แทนที่จะเชื่อหน้าจอออกแบบอย่างเดียว',
+                  title: 'Empathy',
+                  desc: 'เรียนรู้ผู้ที่เลี้ยงสัตว์โดยสร้างจากประสบการณ์และ Pain Point ของตัวเองที่พบเจอ แล้วนำมาปรับใช้',
                 },
               ],
             },
@@ -478,6 +596,10 @@ export const projects = [
         component: {
           count: 10,
           tone: '#21221f',
+          // Only Pawmely mounts the LIVE kit (PawmelyKit.jsx) — it is that
+          // project's own UI rebuilt as React. Other projects draw tinted
+          // silhouettes instead of wearing this kit.
+          kit: 'pawmely',
           platform: 'React Native',
           source: 'ของจริง กดเล่นได้ทุกตัว',
           note: 'ทุกจอประกอบจากชุดเดียวกัน — ปุ่มพิลล์สีโรสนำทางหลัก การ์ดและไทล์ถือเนื้อหา แถบแท็บกระจกลอยคุมการเดินทาง',
@@ -812,7 +934,7 @@ export const projects = [
     // The product's own mark, pulled from the live build's assets — the avatar
     // was a full-page screenshot squeezed into a circle.
     avatar: `${import.meta.env.BASE_URL}metaherb-logo.png`,
-    bio: 'Herbal · Web app · React + TypeScript. ส่วน Herbal Market ของ Metaherb คือตลาดซื้อขายวัตถุดิบสมุนไพรระหว่างธุรกิจ ผู้ซื้อค้นวัตถุดิบจากเกรด ราคาต่อกิโลกรัม ยอดสั่งขั้นต่ำ (MOQ) และสต็อกที่ซัพพลายเออร์เหลือ แล้วเดินต่อได้สามทาง — ขอตัวอย่าง ขอใบเสนอราคา หรือออกใบขอซื้อ (PR) ที่ระบบแปลงเป็น PO ให้เมื่อผู้อนุมัติเซ็น ผมรับผิดชอบส่วนนี้ในฐานะทีมร่วม ส่งงานเข้า repo ของเจ้าของโปรเจกต์เป็น pull request',
+    bio: 'จัดซื้อสมุนไพรทั้งสาย จบไม่ต้องเปิดอีเมลสักฉบับ — Herbal Market ให้ผู้ซื้อ B2B เทียบของด้วยตัวเลขจริง: เกรด ราคาต่อกิโล ขั้นต่ำ สต็อกคงเหลือของซัพพลายเออร์ เจอของที่ใช่แล้วไปต่อได้ทันทีสามทาง — ขอตัวอย่างไปลอง ขอใบเสนอราคาไปเทียบ หรือเปิดใบขอซื้อ (PR) แล้วปล่อยให้ระบบแปลงเป็น PO เองตอนผู้อนุมัติเซ็น (ส่วนนี้ผมทำในฐานะทีมร่วม ส่งงานเข้า repo เจ้าของโปรเจกต์เป็น pull request)',
     // Not a like count: the two numbers that can be checked by anyone opening
     // the repo. See `stats` on Pawmely for the same rule.
     stats: { likes: '10', comments: 52, shares: 6, saves: '22' },
@@ -828,15 +950,6 @@ export const projects = [
     team: METAHERB_TEAM,
     // Not a store release — this one ships as a public web build, so the fact
     // worth printing is what got merged and where it can be opened.
-    downloads: {
-      label: 'งานที่ส่ง',
-      value: '10 · 6',
-      note: 'Pull request ที่ merge แล้ว · หน้าจอ Herbal Market',
-      items: [
-        { label: 'merge ครบ', title: 'Pull request', value: '10' },
-        { label: 'ส่งมอบ', title: 'หน้าจอ', value: '6' },
-      ],
-    },
     tabs: [
       {
         id: 'overview',
@@ -851,9 +964,8 @@ export const projects = [
         report: {
           title: 'รายงานสรุปผลงาน',
           subtitle: 'Metaherb · Herbal Market',
-          // First and last merged pull request under this account — the dates are
-          // GitHub's, not a memory.
-          period: '12 พฤษภาคม – 12 มิถุนายน 2569',
+          // The planning window the printed portfolio (PDF) states.
+          period: '18 พฤษภาคม – 16 มิถุนายน 2569',
           entries: [
             {
               label: 'บทบาทหน้าที่',
@@ -878,42 +990,26 @@ export const projects = [
                 gaugeNote: 'ที่ merge เข้า main แล้วทั้งหมด',
                 cta: 'รายละเอียดงาน',
               },
+              // The four duty cards, matching the printed portfolio (PDF).
               items: [
                 {
-                  title: 'ออกแบบ Flow การจัดซื้อแบบ B2B',
-                  desc: 'ค้นวัตถุดิบ ขอตัวอย่าง ขอใบเสนอราคา แล้วออกใบขอซื้อที่แปลงเป็น PO',
+                  title: 'Get Requirement',
+                  desc: 'ประชุมร่วมกับ PM และทีม เพื่อสรุปวัตถุประสงค์และเป้าหมาย และแบ่งแยก Feature เพื่อนำไป Design',
                 },
                 {
-                  title: 'ทำหน้า Herbal Market',
-                  desc: 'หน้ารายการ รายละเอียด ขอตัวอย่าง สั่งซื้อ ใบเสนอราคา และใบ PR',
+                  title: 'Research',
+                  desc: 'ศึกษารูปแบบ Application หรือโปรแกรมที่มีอยู่ก่อน หรือแนวธุรกิจเดียวกัน เพื่อหาจุดเด่น จุดด้อย และนำมาพัฒนา',
                 },
                 {
-                  title: 'จัดระบบข้อมูลสินค้า',
-                  desc: 'ชื่อเกรดภาษาไทย ป้ายพรีเมียม ราคาต่อกิโลกรัม MOQ และสต็อกคงเหลือ',
+                  title: 'UX/UI Design',
+                  desc: 'ออกแบบ UI ตั้งแต่ Wireframe ไปจนถึง Hi-Wireframe',
                 },
                 {
-                  title: 'ส่งงานผ่าน Pull Request',
-                  desc: 'แยกสาขาของตัวเอง เปิด PR ให้เจ้าของ repo รีวิวก่อน merge ทุกครั้ง',
+                  title: 'Vibe Coding',
+                  desc: 'นำ Hi-Wireframe จาก Figma พัฒนาต่อโดย Vibe Coding ออกมาเป็น Prototype',
                 },
               ],
               // Read off the merged pull requests, newest first.
-              timeline: [
-                {
-                  name: 'PR #5–#6',
-                  period: '8 มิ.ย. 69',
-                  items: ['ชื่อเกรดภาษาไทย', 'ป้ายพรีเมียม', 'Flow ใบขอซื้อ (PR)', 'ปรับตะกร้าแบบ B2B'],
-                },
-                {
-                  name: 'PR #7–#9',
-                  period: '10 มิ.ย. 69',
-                  items: ['แถบข้างของตลาด', 'คำสั่งซื้อแบบ PO', 'Flow ซัพพลายเออร์', 'แก้ยอดรวมในตะกร้า'],
-                },
-                {
-                  name: 'PR #10–#11',
-                  period: '12 มิ.ย. 69',
-                  items: ['เอกสาร B2B ครบวง Quote/PR/PO', 'รหัสสินค้าแบบ ERP', 'การ์ด CTA ซัพพลายเออร์'],
-                },
-              ],
               tools: ['Figma', 'Claude', 'VS Code', 'GitHub'],
             },
             {
@@ -924,13 +1020,12 @@ export const projects = [
               statLabel: 'Merged',
               statNote: 'เข้า main ครบทุกใบ',
               lead: 'ส่วน Herbal Market ขึ้นใช้งานบนบิลด์จริงแล้ว เปิดดูได้ทุกหน้า และโค้ดถูก merge เข้า main ของทีมครบทุก pull request',
-              // PROVENANCE: 10/10 merged — GitHub pulls API, state=all.
-              // 22 = listings the live market page reports ("พบ 22 รายการ").
+              // Figures follow the printed portfolio (PDF ผลลัพธ์ page).
               metrics: [
-                { value: '10', label: 'PR ที่ merge แล้ว' },
-                { value: '6', label: 'หน้าจอที่ส่งมอบ' },
-                { value: '22', label: 'รายการในตลาด' },
-                { value: 'Live', label: 'บิลด์สาธารณะ' },
+                { value: '422', label: 'ลูกค้า (คน)' },
+                { value: '4', label: 'ร้านค้า' },
+                { value: '15', label: 'สินค้า (รายการ)' },
+                { value: '19', label: 'คำสั่งซื้อ (ออเดอร์)' },
               ],
               items: [
                 {
@@ -955,31 +1050,27 @@ export const projects = [
               label: 'ปัญหาที่พบ',
               color: '#21221f',
               headFields: false,
-              stat: '4 เรื่อง',
+              stat: '3 เรื่อง',
               statLabel: 'Issues',
               statNote: 'อุปสรรคที่เจอตอนทำส่วน Herbal Market',
               lead: 'อุปสรรคที่เจอระหว่างทาง และวิธีที่ใช้แก้จริงในงานนี้',
               strip: true,
+              // Matching the printed portfolio (PDF ปัญหาที่พบ page).
               items: [
                 {
-                  title: 'ศัพท์จัดซื้อ',
-                  desc: 'PR / PO / MOQ เป็นคำที่ผู้ใช้ทั่วไปไม่รู้จัก',
-                  fix: 'เขียนคำไทยกำกับทุกจุด และอธิบายขั้นถัดไปไว้ใต้หัวข้อของแต่ละฟอร์ม',
+                  title: 'Timeline',
+                  desc: 'ขอบเขตในการทำงานเร่งด่วน',
+                  fix: 'ประชุมกับทาง PM เพื่อวางแผนการดำเนินงานแบ่ง Phase และกำหนด Priority ว่างานไหนเร่งด่วน',
                 },
                 {
-                  title: 'งานร่วม Repo',
-                  desc: 'ไม่ได้เป็นเจ้าของ repo แก้ตรงเข้า main ไม่ได้',
-                  fix: 'แยกสาขาของตัวเองแล้วเปิด PR ทุกครั้ง ให้เจ้าของรีวิวก่อน merge',
+                  title: 'Understanding',
+                  desc: 'ยังเข้าใจธุรกิจได้ไม่มากพอ',
+                  fix: 'สอบถามและหาแนวทางปรึกษาทำงานร่วมกับทีมกับ PM ให้มากขึ้น และทำการ Research เพิ่มเติมในส่วนที่ยังไม่เข้าใจ',
                 },
                 {
-                  title: 'ยอดรวมตะกร้า',
-                  desc: 'ราคาต่อกิโลกรัมกับ MOQ ทำให้ยอดรวมคำนวณผิด',
-                  fix: 'แก้สูตรให้คูณจากน้ำหนักจริง และแยกส่วนลดเหรียญออกจากยอดสินค้า',
-                },
-                {
-                  title: 'ข้อมูลตัวอย่าง',
-                  desc: 'ข้อมูลสินค้าน้อยเกินกว่าจะเห็นว่าหน้าจริงแน่นแค่ไหน',
-                  fix: 'เพิ่มชุดข้อมูลตัวอย่างให้ครบเกรดและช่วงราคา ก่อนตัดสินใจเรื่องเลย์เอาต์',
+                  title: 'Tool',
+                  desc: 'Token บางครั้งไม่พอใช้งาน',
+                  fix: 'Prompt ให้ครอบคลุมและทำทีละหน้าจอ เก็บส่วนที่ใช้ซ้ำเป็น Component ตั้งแต่ต้น จึงไม่ต้องทำ UI ที่มันซ้ำกันอีกรอบ และลง skill ที่ทำให้ประหยัด Token',
                 },
               ],
             },
@@ -987,26 +1078,19 @@ export const projects = [
               label: 'สิ่งที่ได้เรียนรู้',
               headFields: false,
               color: '#21221f',
-              stat: '4 เรื่อง',
+              stat: '2 เรื่อง',
               statLabel: 'Takeaways',
               statNote: 'ทักษะที่ติดตัวออกมาจากงานนี้',
-              lead: 'สี่อย่างที่ใช้ต่อได้ในงานหลังจากนี้ — งานร่วมทีม ภาษาของผู้ใช้ธุรกิจ การอ่านโค้ดคนอื่น และการส่งงานเป็นชิ้นเล็ก',
+              lead: 'สองอย่างที่ใช้ต่อได้ในงานหลังจากนี้ — เครื่องมือแปลงดีไซน์เป็นของจริง และโลกธุรกิจที่ไม่เคยรู้จัก',
+              // Matching the printed portfolio (PDF สิ่งที่เรียนรู้เพิ่มเติม page).
               items: [
                 {
-                  title: 'ทำงานบน Repo ของคนอื่นให้ไม่ชนกัน',
-                  desc: 'แยกสาขา เปิด PR ทีละเรื่อง และเขียนหัวข้อ PR ให้คนรีวิวรู้ทันทีว่าแตะอะไร ทำให้ 10 ใบผ่านเข้า main ได้โดยไม่ต้องรื้อ',
+                  title: 'Vibe Coding',
+                  desc: 'เรียนรู้การใช้งานเพื่อแปลงดีไซน์จาก Figma ให้กลายเป็น Interactive Prototype ที่ใช้งานได้ พร้อมพัฒนาต่อ',
                 },
                 {
-                  title: 'ออกแบบให้ผู้ใช้ที่เป็นฝ่ายจัดซื้อ',
-                  desc: 'คนกลุ่มนี้ไม่ได้มาเลือกของสวย แต่มาหาเกรด ราคา และ MOQ ที่ตรงสเปค ลำดับข้อมูลบนการ์ดจึงต้องเรียงตามลำดับที่เขาตัดสินใจ',
-                },
-                {
-                  title: 'อ่านโค้ดของคนอื่นก่อนเขียนของตัวเอง',
-                  desc: 'ต่อของใหม่บนโครงที่ทีมวางไว้ ใช้คอมโพเนนต์เดิมแทนการสร้างซ้ำ งานจึงกลืนกับส่วนที่เพื่อนทำไว้',
-                },
-                {
-                  title: 'ส่งงานเป็นชิ้นเล็ก',
-                  desc: 'PR ละเรื่องเดียวทำให้รีวิวเร็วและย้อนกลับง่ายกว่าการส่งก้อนใหญ่ครั้งเดียว',
+                  title: 'Knowledge',
+                  desc: 'เรียนรู้กระบวนการทำงานในรูปแบบใหม่ที่เราไม่เคยพบเจอ เกี่ยวกับ Herbal ERP เป็นต้น คำศัพท์ใหม่ สิ่งเรียนรู้ในรูปแบบที่ไม่เคยรู้จัก',
                 },
               ],
             },
@@ -1042,15 +1126,24 @@ export const projects = [
         // often each value occurs. Nothing is a guess, and nothing is rounded to
         // make it look tidier than the app is.
         cards: [
-          // The SAME art names Pawmely's cards use — the illustrations are drawn
-          // by TopicCard off these keys, and a name it does not know renders
-          // nothing at all. Colour carries no `art` on purpose: the swatch deck
-          // is keyed off the card's id, exactly as it is on Pawmely.
+          // The SAME six cards every project's Design System grid deals, in
+          // Pawmely's order. The illustrations are drawn by TopicCard off these
+          // keys; Colour carries no `art` on purpose — the swatch deck is keyed
+          // off the card's id, exactly as it is on Pawmely.
+          {
+            id: 'component',
+            label: 'Component',
+            color: '#21221f',
+            pills: ['Button', 'Input Fields', 'Filter Dropdown', 'Product Tile', 'Order Summary Card', 'Checkbox', 'Status Badge'],
+          },
           { id: 'typography', label: 'Typography', color: '#21221f', art: 'typeface' },
           { id: 'color', label: 'Color', color: '#319754' },
           { id: 'grid', label: 'Grid & Layout', color: '#33312c', art: 'inspect' },
+          { id: 'lowfi', label: 'Low-fi', color: '#46433c', art: 'wire' },
           { id: 'hifi', label: 'Hi-fi', color: '#1f7a4d', art: 'shot' },
         ],
+        component: metaherbComponent,
+        wireframe: metaherbWireframe,
         typography: {
           tone: '#319754',
           latin: 'IBM Plex Sans Thai Looped',
@@ -1196,7 +1289,7 @@ export const projects = [
     cover: `${import.meta.env.BASE_URL}mm-home-430.webp`,
     video: null,
     avatar: `${import.meta.env.BASE_URL}metaherb-logo.png`,
-    bio: 'Herbal · Mobile app · React Native + Expo + NativeWind. พอร์ตร้านค้า METAHERB จากเว็บมาเป็นแอปมือถือ ฝั่งผู้ซื้อมีหน้าแรก รายละเอียดสินค้า ตะกร้า และการชำระเงิน ฝั่งผู้ขายมีคอนโซลร้านค้าที่ดูออเดอร์ จัดการสินค้า ตั้ง Flash Sale และออกเอกสาร B2B (RFQ / PR / PO) ได้ในแอปเดียว ทั้งหมดวางบนดีไซน์ซิสเต็มที่เขียนเป็นเอกสารไว้ในรีโปก่อนลงมือทำ',
+    bio: 'แอปเดียว เป็นได้ทั้งลูกค้าและเจ้าของร้าน — ฝั่งช้อป: เดินร้าน METAHERB จากมือถือ ดูของ หยิบใส่ตะกร้า จ่ายเงิน จบในเครื่อง ฝั่งขาย: สลับไปคอนโซลร้านแล้วเช็คออเดอร์ จัดสต็อก เปิด Flash Sale กระตุ้นยอด หรือออกเอกสาร B2B (RFQ / PR / PO) ได้โดยไม่ต้องแตะคอมพิวเตอร์ — ร้านทั้งร้านตามไปอยู่ในกระเป๋า',
     // Not likes. Read as: commits by me, screens I added, shared components I
     // extracted, pull requests merged.
     stats: { likes: '22', comments: 14, shares: 2, saves: '10' },
@@ -1207,14 +1300,11 @@ export const projects = [
     // NOTE: the /Main/Home path returns GitHub's 404 page — this is the path
     // that actually serves the build.
     prototypeUrl: 'https://nattapongteero-png.github.io/MobileMetaherb/',
+    // The canvas the app draws at (MOBILE_MAX_WIDTH 430 in its App.tsx) — laid
+    // out at the device default 390 its right edge was cut off in the frame.
+    appViewport: { w: 430, h: 932 },
     repoUrl: 'https://github.com/nattapongteero-png/MobileMetaherb',
     team: MOBILE_METAHERB_TEAM,
-    // The two numbers about the delivery that can be checked in the repo.
-    downloads: {
-      label: 'หน้าจอที่ส่ง',
-      value: '14',
-      note: 'จาก 149 หน้าจอทั้งแอป · คอมโพเนนต์กลาง 10 จาก 44 ตัว',
-    },
     tabs: [
       {
         id: 'overview',
@@ -1229,7 +1319,8 @@ export const projects = [
         report: {
           title: 'รายงานสรุปผลงาน',
           subtitle: 'Metaherb Mobile · React Native app',
-          period: '26 พฤษภาคม – 16 กรกฎาคม 2569',
+          // The planning window the printed portfolio (PDF) states.
+          period: '12 มิถุนายน – 3 กรกฎาคม 2569',
           entries: [
             {
               label: 'บทบาทหน้าที่',
@@ -1239,22 +1330,23 @@ export const projects = [
               statLabel: 'Role',
               statNote: 'ออกแบบและลงมือเขียนหน้าจอเอง · 22 จาก 136 commit ในรีโป',
               lead: 'ทำสองฝั่งของแอป — ฝั่งผู้ซื้อตั้งแต่หน้าแรกจนจ่ายเงิน และคอนโซลฝั่งร้านค้าทั้งชุด พร้อมเขียนดีไซน์ซิสเต็มของโปรเจกต์ไว้เป็นเอกสารกลางให้ทีมใช้ร่วมกัน',
+              // The four duty cards, matching the printed portfolio (PDF).
               items: [
                 {
-                  title: 'พอร์ตดีไซน์จากเว็บมาเป็นแอป',
-                  desc: 'อ่านสเปกจากเว็บ METAHERB แล้วแปลงเป็นหน้าจอ React Native ให้หน้าตาตรงกัน แต่ปรับระยะให้เข้ากริด 8 จุดของฝั่งมือถือ',
+                  title: 'Get Requirement',
+                  desc: 'ประชุมร่วมกับ PM เพื่อสรุปวัตถุประสงค์และเป้าหมาย',
                 },
                 {
-                  title: 'สร้างคอนโซลร้านค้า',
-                  desc: 'แดชบอร์ดออเดอร์ จัดการสินค้า Flash Sale โปรโมชั่น และเอกสาร B2B (ใบเสนอราคา / PR / PO) รวมเป็นโหมดผู้ขายในแอปเดียวกัน',
+                  title: 'UX/UI Design',
+                  desc: 'พัฒนา UI จากตัวเว็บไซต์มาต่อยอด ให้ตัว UI responsive รองรับทุก Device',
                 },
                 {
-                  title: 'เขียนดีไซน์ซิสเต็มเป็นเอกสาร',
-                  desc: 'guidelines/Guidelines.md — พาเลตต์ สเกลตัวอักษร กริด 8 จุด สเกลมุมโค้ง เกณฑ์ contrast WCAG AA และกฎเวลาแอนิเมชัน 100/300/500 มิลลิวินาที ให้ทุกคนอ้างอิงชุดเดียวกัน',
+                  title: 'Vibe Coding',
+                  desc: 'นำ Hi-Wireframe จาก Figma พัฒนาต่อโดย Vibe Coding ออกมาเป็น Prototype',
                 },
                 {
-                  title: 'แยกคอมโพเนนต์กลาง',
-                  desc: 'ปุ่มไอคอน การ์ดสินค้า บอตทอมชีต หัวเพจ ป้ายตัวเลข วีลพิกเกอร์ ฯลฯ 10 ตัว ตามกฎ rule of three ที่เขียนไว้ในไกด์ไลน์เอง',
+                  title: 'Handoff',
+                  desc: 'นำ Code Front-end ที่เกี่ยวกับการ Design ลง GitHub เพื่อส่งมอบให้กับทาง Dev นำไปพัฒนาต่อ',
                 },
               ],
             },
@@ -1264,9 +1356,11 @@ export const projects = [
               stat: '14',
               statLabel: 'Screens',
               statNote: 'หน้าจอที่เพิ่มเข้าไปในแอป จากทั้งหมด 149 หน้า',
-              lead: 'แอปกดเล่นได้จริงบนเว็บผ่าน Expo web export และรันบนเครื่องจริงทั้ง iOS และ Android จากโค้ดชุดเดียว',
+              // Status per the printed portfolio (PDF ผลลัพธ์ page): Handoff,
+              // in the developers' hands now.
+              lead: 'สถานะ Handoff — กำลังอยู่ในขั้นตอนพัฒนาของทางฝั่งนักพัฒนาโปรแกรม แอปกดเล่นได้จริงบนเว็บผ่าน Expo web export',
               metrics: [
-                { label: 'Commit', value: '22', note: 'ช่วง 26 พ.ค. – 16 ก.ค. 69' },
+                { label: 'สถานะ', value: 'Handoff', note: 'อยู่ในมือทีมพัฒนา' },
                 { label: 'หน้าจอ', value: '14', note: 'เพิ่มใหม่ในรีโป' },
                 { label: 'คอมโพเนนต์', value: '10', note: 'แยกเป็นของกลาง' },
                 { label: 'Pull request', value: '2', note: 'merge เข้า main แล้ว' },
@@ -1294,56 +1388,45 @@ export const projects = [
               label: 'ปัญหาที่พบ',
               color: '#46433c',
               strip: true,
-              stat: '4',
+              stat: '3',
               statLabel: 'Issues',
               statNote: 'ปัญหาที่เจอตอนทำจริงและวิธีที่แก้',
-              lead: 'ส่วนใหญ่เป็นเรื่องความต่างระหว่างแพลตฟอร์ม — สิ่งที่ทำงานบน iOS ไม่ได้แปลว่าทำงานบน Android',
+              lead: 'อุปสรรคที่เจอระหว่างทาง และวิธีที่ใช้แก้จริงในงานนี้',
+              // Matching the printed portfolio (PDF ปัญหาที่พบ page).
               items: [
                 {
-                  title: 'Liquid Glass มีเฉพาะ iOS 26 ขึ้นไป',
-                  desc: 'แถบลอยแบบกระจกใช้ได้จริงแค่ iOS 26+ กับเว็บ ส่วน Android และ iOS รุ่นเก่าไม่มี ถ้าปลอมความโปร่งใสเนื้อหาด้านหลังจะทะลุขึ้นมาอ่านไม่ออก',
-                  fix: 'เช็กเวอร์ชันตอนรันแล้วสลับเป็นพิลล์ทึบสีขาวชุดเดียวกันเมื่อไม่มีของจริง — หน้าตาไม่เหมือนเป๊ะแต่ยังอ่านได้ทุกเครื่อง',
+                  title: 'Timeline',
+                  desc: 'ขอบเขตในการทำงานเร่งด่วน',
+                  fix: 'วาง Design System ให้เสร็จก่อนวันแรกจบ หน้าที่เหลือจึงประกอบจากของเดิมแทนการออกแบบใหม่ทุกหน้า',
                 },
                 {
-                  title: 'เงาการ์ดบน Android ซ้อนสองชั้น',
-                  desc: 'การ์ดใส่ทั้ง boxShadow และ elevation ทำให้ Android วาดเงาสองที และ boxShadow ยังเพี้ยนเมื่อการ์ดถูก transform ในคารูเซล',
-                  fix: 'แยกตามแพลตฟอร์ม — iOS ใช้ boxShadow สองชั้นตามสเปก Android ใช้ elevation อย่างเดียวบนพื้นทึบ เพราะ Android วาดเงาจากรูปทรงของ view เอง',
+                  title: 'Objective & Goal',
+                  desc: 'ขอบเขตไม่ชัด มีเพิ่มลดสเปคทีหลัง',
+                  fix: 'สรุปขอบเขตกับ PM ก่อนลงมือ และแยกฟีเจอร์เป็น Phase — ที่ต้องมีใน Phase 1 กับที่ยกไปทำ Phase อื่น',
                 },
                 {
-                  title: 'สระและวรรณยุกต์ไทยดันความสูงบรรทัด',
-                  desc: 'ข้อความไทยใน pill และ badge เยื้องออกจากกลางเพราะ Android เผื่อที่ให้ตัวบนตัวล่างเสมอ',
-                  fix: 'ตั้ง lineHeight ราว 1.2 เท่าของขนาดตัวอักษรทุกที่ และปิด includeFontPadding บน Android',
-                },
-                {
-                  title: 'กริดสินค้า 2 คอลัมน์แตกบางเครื่อง',
-                  desc: 'ความกว้างการ์ดที่คำนวณได้เป็นทศนิยม ทำให้ flex-wrap ดันการ์ดใบที่สองตกบรรทัด',
-                  fix: 'ปัดลงเป็นจำนวนเต็มเสมอ แล้วเขียนสูตรนี้ไว้ในคู่มือโปรเจกต์ให้ทุกกริดใช้ตัวเดียวกัน',
+                  title: 'Tool',
+                  desc: 'Token บางครั้งไม่พอใช้งาน',
+                  fix: 'Prompt ให้ครอบคลุมและทำทีละหน้าจอ เก็บส่วนที่ใช้ซ้ำเป็น Component ตั้งแต่ต้น จึงไม่ต้องทำ UI ที่มันซ้ำกันอีกรอบ และลง skill ที่ทำให้ประหยัด Token',
                 },
               ],
             },
             {
               label: 'สิ่งที่ได้เรียนรู้',
               color: '#5a5750',
-              stat: '4',
+              stat: '2',
               statLabel: 'Takeaways',
               statNote: 'สิ่งที่เปลี่ยนวิธีทำงานหลังจบโปรเจกต์นี้',
-              lead: 'บทเรียนหลักคือดีไซน์ซิสเต็มต้องเขียนออกมาเป็นข้อความ ไม่ใช่เก็บไว้ในหัวหรือในไฟล์ Figma อย่างเดียว',
+              lead: 'สองอย่างที่ใช้ต่อได้ในงานหลังจากนี้ — เครื่องมือแปลงดีไซน์เป็นของจริง และการทดสอบบนเครื่องมือใกล้โปรดักส์จริง',
+              // Matching the printed portfolio (PDF สิ่งที่เรียนรู้เพิ่มเติม page).
               items: [
                 {
-                  title: 'เขียนกฎก่อนวาดจอ',
-                  desc: 'ทำเอกสารไกด์ไลน์ให้จบก่อน แล้วอ้างอิงตอนรีวิวงาน ทำให้เถียงกันด้วยเหตุผลแทนรสนิยม',
+                  title: 'Vibe Coding',
+                  desc: 'เรียนรู้การใช้งานเพื่อแปลงดีไซน์จาก Figma ให้กลายเป็น Interactive Prototype ที่ใช้งานได้ พร้อมพัฒนาต่อ',
                 },
                 {
-                  title: 'โทเคนกับคอมโพเนนต์ใช้เกณฑ์คนละแบบ',
-                  desc: 'ค่าพื้นฐาน (สี ระยะ มุมโค้ง) ทำเป็นโทเคนได้ทันทีตั้งแต่ใช้ที่เดียว แต่คอมโพเนนต์ต้องรอให้ใช้ซ้ำครบสามที่ก่อนค่อยแยก ไม่งั้นได้ abstraction ที่ผิด',
-                },
-                {
-                  title: 'ออกแบบเผื่อแพลตฟอร์มที่ไม่มีของ',
-                  desc: 'ทุกลูกเล่นที่พึ่งของเฉพาะ iOS ต้องมีทางถอยที่ยังใช้งานได้บน Android ตั้งแต่ตอนออกแบบ ไม่ใช่ไปแก้ตอนเจอบั๊ก',
-                },
-                {
-                  title: 'ปรับสเปกจากเว็บให้เข้ากริด',
-                  desc: 'ก็อประยะจากเว็บมาตรง ๆ ได้ค่าอย่าง 10 หรือ 14 ปนมาด้วย เลยตั้งกฎว่าให้คงหน้าตาไว้แต่ปัดระยะเข้ากริด 4/8 เสมอ',
+                  title: 'Testing',
+                  desc: 'เรียนรู้เครื่องมือที่นำมาทดสอบ UI ที่ใกล้เคียงโปรดักส์จริง เช่น Xcode , Android Studio',
                 },
               ],
             },
@@ -1369,134 +1452,22 @@ export const projects = [
         // build disagrees with the guideline, the guideline is quoted and the
         // drift is stated rather than hidden.
         cards: [
-          { id: 'component', label: 'Component', color: '#21221f' },
+          {
+            id: 'component',
+            label: 'Component',
+            color: '#21221f',
+            // The jar of draggable pills every project's Component card wears —
+            // the six most load-bearing of the ten shared components below.
+            pills: ['ProductCard', 'BottomSheet', 'PageHeader', 'IconButton', 'WheelPicker', 'CountBadge'],
+          },
           { id: 'typography', label: 'Typography', color: '#33312c', art: 'typeface' },
           { id: 'color', label: 'Color', color: '#319754' },
           { id: 'grid', label: 'Grid & Layout', color: '#5a5750', art: 'inspect' },
+          { id: 'lowfi', label: 'Low-fi', color: '#46433c', art: 'wire' },
           { id: 'hifi', label: 'Hi-fi', color: '#267a43', art: 'shot' },
         ],
-        component: {
-          count: 10,
-          tone: '#319754',
-          platform: 'React Native',
-          source: 'แยกจากหน้าจอจริงในรีโป',
-          note: 'สิบตัวนี้คือคอมโพเนนต์ที่แยกออกมาเป็นของกลางเอง จากทั้งหมด 44 ตัวในโปรเจกต์ — เกณฑ์คือใช้ซ้ำครบสามที่และพฤติกรรมเหมือนกันจริง ตามกฎ rule of three ในไกด์ไลน์',
-          items: [
-            { name: 'ProductCard', kind: 'tile', role: 'Commerce', use: 'การ์ดสินค้าในกริดสองคอลัมน์ สูง 259 ปกติ และ 290 เมื่อมีแถบ Flash Sale ราคาลดเป็นแดง ราคาปกติเป็นเขียว' },
-            { name: 'BottomSheet', kind: 'card', role: 'Surface', use: 'ชีตจากขอบล่างสำหรับตัวเลือกและฟอร์มย่อย มุมบน 15 ปัดเฉพาะสองมุม' },
-            { name: 'PageHeader', kind: 'card', role: 'Navigation', use: 'หัวเพจสีแบรนด์พร้อมปุ่มย้อนกลับทรงกลม ใช้ซ้ำทุกหน้าย่อย' },
-            { name: 'IconButton', kind: 'button', role: 'Action', use: 'ปุ่มไอคอนวงกลม ขยายพื้นที่กดด้วย hitSlop ให้ถึง 44pt โดยไม่ทำให้ตัวปุ่มบวม' },
-            { name: 'CountBadge', kind: 'badge', role: 'Status', use: 'ป้ายตัวเลขบนไอคอนตะกร้าและกระดิ่ง พื้นแดง #ee4d2d ตัวอักษร 10' },
-            { name: 'WheelPicker', kind: 'toggle', role: 'Form', use: 'วงล้อเลือกเดือนและปีในตัวกรอง Flash Sale แทน dropdown ที่กดยากบนมือถือ' },
-            { name: 'StickyFilterList', kind: 'steps', role: 'Navigation', use: 'แถบค้นหาและตัวกรองที่ค้างบนสุดขณะเลื่อนรายการยาว' },
-            { name: 'EmptyState', kind: 'skeleton', role: 'Feedback', use: 'สถานะว่างที่สอนด้วยตัวอย่าง ไม่ใช่ข้อความยาว ตามหลัก Paradox of the Active User' },
-            { name: 'Skeleton', kind: 'skeleton', role: 'Feedback', use: 'โครงร่างระหว่างโหลดที่มีทรงเท่าเนื้อหาจริง กันหน้ากระโดดตอนข้อมูลมา' },
-            { name: 'FlashSaleHero', kind: 'card', role: 'Commerce', use: 'หัวโซน Flash Sale พร้อมนาฬิกานับถอยหลัง ตัวเลขขาวบนกล่องแดง #bc1b06' },
-          ],
-        },
-        typography: {
-          tone: '#319754',
-          latin: 'System (San Francisco / Roboto)',
-          thai: 'IBM Plex Sans Thai Looped',
-          classification: 'System sans · Looped Thai สำหรับหัวเรื่อง',
-          note: 'ตัวหลักใช้ฟอนต์ระบบเพื่อให้ตัวไทยเรนเดอร์ตามเครื่องผู้ใช้และไม่ต้องแบกไฟล์ฟอนต์ ส่วน IBM Plex Sans Thai Looped ที่เป็นฟอนต์แบรนด์จากฝั่งเว็บโหลดเฉพาะน้ำหนัก Medium กับ Bold ไว้ใช้กับหัวเรื่อง — วัดจากบิลด์จริง ข้อความ 831 จุดเป็นฟอนต์ระบบ และ 6 จุดเป็น IBM Plex',
-          weights: [
-            { name: 'Regular', value: 400 },
-            { name: 'Medium', value: 500 },
-            { name: 'SemiBold', value: 600 },
-            { name: 'Bold', value: 700 },
-          ],
-          scale: [
-            { role: 'Section heading', token: 'heading/20', px: 20, weight: 500, usage: 'หัวข้อโซน' },
-            { role: 'Screen title', token: 'title/18', px: 18, weight: 700, usage: 'ชื่อหน้าจอ' },
-            { role: 'Body', token: 'body/14', px: 14, weight: 400, usage: 'เนื้อความ · ชื่อการ์ด' },
-            { role: 'Sub', token: 'sub/13', px: 13, weight: 400, usage: 'บรรทัดรอง' },
-            { role: 'Caption', token: 'caption/12', px: 12, weight: 400, usage: 'คำบรรยาย' },
-            { role: 'Meta', token: 'meta/11', px: 11, weight: 400, usage: 'เรตติ้ง · ยอดขาย · ป้าย' },
-            { role: 'Micro', token: 'micro/10', px: 10, weight: 700, usage: 'ตัวเลขนับถอยหลัง · ป้ายเล็ก' },
-          ],
-        },
-        color: {
-          brand: {
-            name: 'METAHERB Green',
-            hex: '#319754',
-            token: 'BRAND_GREEN',
-            harmony: 'เขียวแบรนด์ · แดงเร่งด่วนสงวนไว้เฉพาะส่วนลด · เทากลาง',
-            note: 'เขียวคือสีเดียวที่ใช้กับปุ่มหลักและสถานะทำงาน ส่วนแดงถูกสงวนไว้สำหรับ Flash Sale และราคาลดเท่านั้น — ถ้าเอาไปใช้ที่อื่นความหมายเร่งด่วนจะหายไป เป็นกฎที่เขียนห้ามไว้ในไกด์ไลน์ตรง ๆ',
-          },
-          groups: [
-            {
-              name: 'Brand',
-              on: '#FFFFFF',
-              swatches: [
-                { name: 'Brand Green', hex: '#319754', token: 'BRAND_GREEN', usage: 'ปุ่มหลัก · แท็บที่เลือก · หัวเพจ' },
-                { name: 'Green Dark', hex: '#267A43', token: 'BRAND_GREEN_DARK', usage: 'สถานะกด' },
-                { name: 'Price Green', hex: '#226A3B', token: 'PRICE_GREEN', usage: 'ราคาที่ไม่ลด' },
-                { name: 'Green Tint', hex: '#E6F5EC', token: 'BRAND_GREEN_TINT', usage: 'พื้นอ่อน · ชิปวงกลม' },
-              ],
-            },
-            {
-              name: 'Urgency (Flash Sale เท่านั้น)',
-              on: '#FFFFFF',
-              swatches: [
-                { name: 'Price Red', hex: '#E62E05', token: 'PRICE_RED', usage: 'ราคาหลังลด' },
-                { name: 'Countdown', hex: '#BC1B06', token: 'countdown', usage: 'กล่องตัวเลขนับถอยหลัง' },
-                { name: 'Badge Red', hex: '#EE4D2D', token: 'BADGE_RED', usage: 'ป้ายจำนวน · ป้ายส่วนลด' },
-                { name: 'Star', hex: '#F59E0B', token: 'STAR_YELLOW', usage: 'ดาวเรตติ้ง (คู่กับรูปดาวเสมอ)' },
-              ],
-            },
-            {
-              name: 'Neutral',
-              on: '#0A0A0A',
-              swatches: [
-                { name: 'Text Primary', hex: '#0A0A0A', token: 'TEXT_PRIMARY', usage: 'ตัวหนังสือหลัก' },
-                { name: 'Text Secondary', hex: '#525252', token: 'TEXT_SECONDARY', usage: 'บรรทัดรอง' },
-                { name: 'Text Muted', hex: '#737373', token: 'TEXT_MUTED', usage: 'คำบรรยาย · placeholder' },
-                { name: 'Surface', hex: '#F5F5F5', token: 'SURFACE_GRAY', usage: 'พื้นรอง' },
-                { name: 'Border', hex: '#E5E7EB', token: 'BORDER_GRAY', usage: 'เส้นขอบ' },
-                { name: 'Page', hex: '#FAFAFA', token: 'page', usage: 'พื้นหน้าจอ' },
-              ],
-            },
-          ],
-        },
-        grid: {
-          base: 8,
-          tone: '#319754',
-          note: 'ระยะและขนาดทุกค่าเป็นพหุคูณของ 4 ตั้งต้นที่ 8 และใช้ 4 เฉพาะรายละเอียดเล็ก — เขียนเป็นกฎไว้ในไกด์ไลน์ของโปรเจกต์ ตรวจกับบิลด์จริงแล้วยังมีค่า 3/5/6 หลงเหลือจากตอนพอร์ตจากเว็บ ซึ่งเป็นส่วนที่ยังไล่เก็บไม่หมด',
-          container: { screen: 430, content: 398, margin: 16 },
-          spacing: [
-            { token: 'xs', value: 4 },
-            { token: 'sm', value: 8 },
-            { token: 'gap', value: 12 },
-            { token: 'md', value: 16 },
-            { token: 'lg', value: 24 },
-            { token: 'lg+', value: 32 },
-            { token: 'xl', value: 48 },
-          ],
-          margins: [
-            { value: 16, use: 'ขอบจอมาตรฐาน · พื้นที่ในการ์ด' },
-            { value: 12, use: 'ช่องไฟระหว่างการ์ดในกริดสองคอลัมน์' },
-            { value: 24, use: 'ระยะห่างระหว่างโซน' },
-          ],
-          radius: [
-            { name: 'sm', value: 4 },
-            { name: 'lg', value: 8 },
-            { name: 'xl', value: 12 },
-            { name: '2xl', value: 16 },
-            { name: 'pill', value: 999 },
-          ],
-          sizes: [
-            { name: 'ปุ่มหลัก', value: 48 },
-            { name: 'พื้นที่กดขั้นต่ำ (iOS)', value: 44 },
-            { name: 'การ์ดสินค้าปกติ', value: 259 },
-            { name: 'การ์ดสินค้า Flash Sale', value: 290 },
-          ],
-          breakpoint: 700,
-          layouts: [
-            { name: 'Phone', range: '< 700pt', note: 'กริดสินค้าสองคอลัมน์ ความกว้างการ์ดคำนวณแล้วปัดลงเป็นจำนวนเต็มเสมอ' },
-            { name: 'Tablet', range: '≥ 700pt', note: 'กริดขยายเป็นสี่คอลัมน์ และเนื้อหาแบบคอลัมน์เดียวถูกจำกัดความกว้างที่ 680pt ให้อ่านสบาย' },
-          ],
-        },
+        ...MM_SYSTEM,
+        wireframe: mobileWireframe,
         hifi: {
           container: { screen: 430, height: 932 },
           note: 'Hi-fi คือหน้าจอจริงที่ลงสี ฟอนต์ และคอมโพเนนต์ครบตามดีไซน์ซิสเต็ม — ชุดนี้จับจากบิลด์เว็บสาธารณะของแอป ที่ความกว้าง 430 ซึ่งเป็นแคนวาสที่ออกแบบไว้',
@@ -1528,55 +1499,429 @@ export const projects = [
     ],
   },
   // ---------------------------------------------------------------------------
-  // PLACEHOLDERS. Two more projects belong in this portfolio; only their NAMES
-  // have been given so far, so only their names are here. Every other field is
-  // deliberately empty rather than filled with something plausible — a portfolio
-  // is a record of work that was actually done, and an invented tagline, tech
-  // stack or metric on one of these would be indistinguishable from the real
-  // ones above.
-  //
-  // To finish either: fill `tagline`, `bio`, `accent`, `avatar`, `cover`,
-  // `techStack`, `prototypeUrl`, `repoUrl` and its `tabs` the way the three
-  // projects above are filled. Until then they appear as titles in the section
-  // list and nothing else claims to be true about them.
+  // META CAFFE — the in-app cafe of the Metaherb Mobile app. Same repo, same
+  // public build: the prototype link is Metaherb Mobile's Expo web export, and
+  // the cafe lives inside it (home banner "META Caffe"). The cover is captured
+  // off that build's cafe home by scripts/capture-cafe.mjs; report content
+  // follows the printed portfolio (PDF).
   // ---------------------------------------------------------------------------
   {
     id: 'metaherb-cafe',
-    tab: '',
+    tab: 'Cafe',
     title: 'Metaherb Cafe',
-    tagline: '',
-    handle: '',
-    accent: null,
-    cover: null,
+    tagline: 'The whole cafe inside the METAHERB app — your queue ticking on the Lock Screen.',
+    handle: '@meta.caffe',
+    accent: '#319754',
+    cover: `${import.meta.env.BASE_URL}mc-cafe-430.webp`,
     video: null,
-    avatar: null,
-    bio: '',
+    avatar: `${import.meta.env.BASE_URL}metaherb-logo.png`,
+    // Ordering/payment in the app is a stated mockup (no backend) — this text
+    // sells what the SYSTEM does, and claims nothing about live services.
+    bio: 'สั่งกาแฟเสร็จ ล็อกจอได้เลย — คิวของคุณนับถอยหลังอยู่บน Dynamic Island จนแก้วเสร็จ META Caffe คือคาเฟ่ทั้งร้านในแอป: เมนู 6 หมวดปรับแก้วได้ถึงระดับหวาน ชนิดนม และช็อตกาแฟ จ่าย PromptPay หรือเงินสด รับที่ร้านหรือส่งถึงที่ แก้วโปรดกดสั่งซ้ำได้ทั้งสูตร ฝั่งหลังบาร์บาริสต้าเห็นคิวเดียวกันแบบเรียลไทม์ กดเสร็จปุ๊บลูกค้ารู้ปั๊บ — Live Activity บน Lock Screen เป็น native module ที่เขียนเองด้วย Swift/ActivityKit',
     stats: null,
-    techStack: [],
-    kind: '',
-    category: '',
-    prototypeUrl: null,
-    repoUrl: null,
-    tabs: [],
+    techStack: ['React Native', 'Expo', 'Swift', 'Figma', 'GitHub'],
+    kind: 'Mobile app',
+    category: 'Cafe',
+    // The Metaherb Mobile build, told to open ON the cafe: the app reads
+    // ?screen=Cafe on web boot (a query string, because GitHub Pages 404s any
+    // real path) and navigates straight to the café home.
+    prototypeUrl: 'https://nattapongteero-png.github.io/MobileMetaherb/?screen=Cafe',
+    appViewport: { w: 430, h: 932 },
+    repoUrl: 'https://github.com/nattapongteero-png/MobileMetaherb',
+    team: MOBILE_METAHERB_TEAM,
+    tabs: [
+      {
+        id: 'overview',
+        label: 'Project Overview',
+        detail: 'feed',
+        cards: [
+          { id: 'role', label: 'บทบาทหน้าที่', color: '#21221f', art: 'report' },
+          { id: 'outcome', label: 'ผลการดำเนินงาน', color: '#33312c', art: 'report' },
+          { id: 'problems', label: 'ปัญหาที่พบ', color: '#46433c', art: 'report' },
+          { id: 'learned', label: 'สิ่งที่ได้เรียนรู้', color: '#5a5750', art: 'report' },
+        ],
+        report: {
+          title: 'รายงานสรุปผลงาน',
+          subtitle: 'Metaherb Cafe · ระบบซื้อเครื่องดื่ม ขนม',
+          // The planning window the printed portfolio (PDF) states.
+          period: '12 มิถุนายน – 3 กรกฎาคม 2569',
+          entries: [
+            {
+              label: 'บทบาทหน้าที่',
+              headFields: false,
+              color: '#21221f',
+              stat: 'UX/UI',
+              statLabel: 'Role',
+              statNote: 'โปรโมทและเพิ่มยอดขายสินค้าของ Metaherb Cafe · ต่อยอด UI เดิมให้ไปทิศทางเดียวกับ App Metaherb',
+              lead: 'คาเฟ่ในแอป METAHERB สำหรับพนักงานออฟฟิศและคนที่ชื่นชอบเครื่องดื่มกับของหวาน — นำ UI ที่เคยพัฒนาไว้มาปรับให้เข้ากับแอปหลัก แล้วพัฒนาต่อเป็น Prototype ที่กดเล่นได้',
+              // The four duty cards, matching the printed portfolio (PDF).
+              items: [
+                {
+                  title: 'Get Requirement',
+                  desc: 'ประชุมร่วมกับ PM เพื่อสรุปวัตถุประสงค์และเป้าหมาย',
+                },
+                {
+                  title: 'UX/UI Design',
+                  desc: 'นำ UI ที่เคยพัฒนาก่อนหน้าอยู่แล้วมาปรับให้เข้ากับ App Metaherb',
+                },
+                {
+                  title: 'Vibe Coding',
+                  desc: 'นำ UI ที่มีอยู่แล้วพัฒนาต่อโดย Vibe Coding ออกมาเป็น Prototype',
+                },
+                {
+                  title: 'Handoff',
+                  desc: 'นำ Code Front-end ที่เกี่ยวกับการ Design ลง GitHub เพื่อส่งมอบให้กับทาง Dev นำไปพัฒนาต่อ',
+                },
+              ],
+              tools: ['Figma', 'Claude', 'VS Code', 'Xcode', 'GitHub'],
+            },
+            {
+              label: 'ผลการดำเนินงาน',
+              headFields: false,
+              color: '#21221f',
+              stat: 'Handoff',
+              statLabel: 'Status',
+              statNote: 'อยู่ในขั้นตอนพัฒนาของฝั่งนักพัฒนาโปรแกรม',
+              // Status per the printed portfolio (PDF ผลลัพธ์ page).
+              lead: 'สถานะ Handoff — กำลังอยู่ในขั้นตอนพัฒนาของทางฝั่งนักพัฒนาโปรแกรม ตัวคาเฟ่กดเล่นได้จริงในบิลด์ของ Metaherb Mobile',
+              items: [
+                {
+                  title: 'Design UX/UI , Vibe Coding',
+                  desc: 'ออกแบบ UX/UI , Vibe Coding ตาม Requirement',
+                },
+                {
+                  title: 'Test UX/UI',
+                  desc: 'ทดสอบการใช้งานบนเครื่องก่อน Handoff UI ต่อให้ทีมพัฒนา',
+                },
+                {
+                  title: 'Handoff',
+                  desc: 'ส่งต่อไฟล์และโค้ดผ่าน GitHub ให้ทีมพัฒนาต่อ',
+                },
+                {
+                  title: 'Feedback',
+                  desc: 'รับความเห็นจากทีมและ PM มาปรับแก้ไข UX/UI',
+                },
+              ],
+            },
+            {
+              label: 'ปัญหาที่พบ',
+              color: '#21221f',
+              headFields: false,
+              stat: '3 เรื่อง',
+              statLabel: 'Issues',
+              statNote: 'อุปสรรคที่เจอตอนทำระบบคาเฟ่',
+              lead: 'อุปสรรคที่เจอระหว่างทาง และวิธีที่ใช้แก้จริงในงานนี้',
+              strip: true,
+              // Matching the printed portfolio (PDF ปัญหาที่พบ page).
+              items: [
+                {
+                  title: 'Timeline',
+                  desc: 'ขอบเขตในการทำงานเร่งด่วน',
+                  fix: 'กำหนด Priority Feature และว่าควรทำส่วนไหนก่อนหลัง เพื่อให้พัฒนาทันใช้งาน',
+                },
+                {
+                  title: 'Objective & Goal',
+                  desc: 'ขอบเขตไม่ชัด ที่เพิ่มลดสเปคทีหลัง',
+                  fix: 'สรุปขอบเขตกับ PM ก่อนลงมือ และแยกฟีเจอร์เป็น Phase — ที่ต้องมีใน Phase 1 กับที่ยกไปทำ Phase อื่น',
+                },
+                {
+                  title: 'Tool',
+                  desc: 'Token บางครั้งไม่พอใช้งาน',
+                  fix: 'Prompt ให้ครอบคลุมและทำทีละหน้าจอ เก็บส่วนที่ใช้ซ้ำเป็น Component ตั้งแต่ต้น จึงไม่ต้องทำ UI ที่มันซ้ำกันอีกรอบ และลง skill ที่ทำให้ประหยัด Token',
+                },
+              ],
+            },
+            {
+              label: 'สิ่งที่ได้เรียนรู้',
+              headFields: false,
+              color: '#21221f',
+              stat: '3 เรื่อง',
+              statLabel: 'Takeaways',
+              statNote: 'ทักษะที่ติดตัวออกมาจากงานนี้',
+              lead: 'สามอย่างที่ใช้ต่อได้ในงานหลังจากนี้ — เครื่องมือแปลงดีไซน์ การใช้ AI และการทำดีไซน์ให้เป็นระบบ',
+              // Matching the printed portfolio (PDF สิ่งที่เรียนรู้เพิ่มเติม page).
+              items: [
+                {
+                  title: 'Vibe Coding',
+                  desc: 'เรียนรู้การใช้งานเพื่อแปลงดีไซน์จาก Figma ให้กลายเป็น Interactive Prototype ที่ใช้งานได้ พร้อมพัฒนาต่อ',
+                },
+                {
+                  title: 'Skill AI',
+                  desc: 'เรียนรู้การใช้ AI เป็นเครื่องมือให้ประหยัดหรือตรงต่อความต้องการ เช่น ใส่ Skill ให้ AI ตรงตามสเปคที่เราต้องการ',
+                },
+                {
+                  title: 'Design System',
+                  desc: 'เรียนรู้การ Design Specs และ Component ให้เป็นระบบ เพื่อนำไปใช้และพัฒนาต่อได้ง่าย',
+                },
+              ],
+            },
+          ],
+        },
+        blocks: [
+          { type: 'heading', text: 'META Caffe' },
+          {
+            type: 'paragraph',
+            text: 'The cafe half of the METAHERB app: browse, customise, pay, and watch your queue count down on the Lock Screen.',
+          },
+        ],
+      },
+      {
+        id: 'design-system',
+        label: 'Design System',
+        cardColor: '#319754',
+        detail: 'feed',
+        detailStart: 'Color',
+        // The cafe ships INSIDE the MobileMetaherb repo, on the same documented
+        // system — so the token pages here are MM_SYSTEM verbatim, not a copy
+        // that could drift. Only the Hi-fi screens are the cafe's own, captured
+        // off the public build by scripts/capture-cafe-hifi.mjs.
+        cards: [
+          {
+            id: 'component',
+            label: 'Component',
+            color: '#21221f',
+            pills: ['ProductCard', 'BottomSheet', 'PageHeader', 'IconButton', 'WheelPicker', 'CountBadge'],
+          },
+          { id: 'typography', label: 'Typography', color: '#33312c', art: 'typeface' },
+          { id: 'color', label: 'Color', color: '#319754' },
+          { id: 'grid', label: 'Grid & Layout', color: '#5a5750', art: 'inspect' },
+          { id: 'lowfi', label: 'Low-fi', color: '#46433c', art: 'wire' },
+          { id: 'hifi', label: 'Hi-fi', color: '#267a43', art: 'shot' },
+        ],
+        ...MM_SYSTEM,
+        wireframe: cafeWireframe,
+        hifi: {
+          container: { screen: 430, height: 932 },
+          note: 'Hi-fi คือหน้าจอจริงที่ลงสี ฟอนต์ และคอมโพเนนต์ครบตามดีไซน์ซิสเต็ม — ชุดนี้จับจากบิลด์สาธารณะของแอป เส้นทางสั่งเครื่องดื่มครบตั้งแต่เมนูถึงจ่ายเงิน',
+          screens: [
+            {
+              name: 'Cafe home',
+              note: 'เมนูฮิตจัดอันดับ แบนเนอร์ และช่องค้นหาเมนู',
+              src: `${import.meta.env.BASE_URL}cafe-home-430.webp`,
+            },
+            {
+              name: 'Item detail',
+              note: 'ปรับแก้วเอง — ระดับหวาน จำนวน และช็อตเพิ่ม',
+              src: `${import.meta.env.BASE_URL}cafe-item-430.webp`,
+            },
+            {
+              name: 'Cart',
+              note: 'ตะกร้าพร้อมสูตรแก้วที่เลือก และแถบสั่งซื้อ',
+              src: `${import.meta.env.BASE_URL}cafe-cart-430.webp`,
+            },
+            {
+              name: 'Checkout',
+              note: 'สรุปคำสั่งซื้อ วิธีรับ และช่องทางจ่ายเงิน',
+              src: `${import.meta.env.BASE_URL}cafe-pay-430.webp`,
+            },
+          ],
+        },
+        blocks: [],
+      },
+    ],
   },
+  // ---------------------------------------------------------------------------
+  // MYATLAS — the Flutter health companion. The device model is staged with the
+  // live build's own landing screen as its cover (scripts/capture-myatlas.mjs);
+  // prototypeUrl is EMPTY on purpose — the owner will hand the link over, and
+  // until then the page shows the parked device without a play button. `scene`
+  // is forced so the model stands like every other project page even without
+  // that link. Report content follows the printed portfolio (PDF).
+  // ---------------------------------------------------------------------------
   {
     id: 'myatlas',
-    tab: '',
+    tab: 'Health',
     title: 'MyAtlas',
-    tagline: '',
-    handle: '',
-    accent: null,
-    cover: null,
+    tagline: "Your whole health — and your family's — in one app.",
+    handle: '@myatlas.app',
+    // The app's own brand green, read out of its theme (lib/core/theme).
+    accent: '#1D8B6B',
+    cover: `${import.meta.env.BASE_URL}ma-home-390.webp`,
     video: null,
-    avatar: null,
-    bio: '',
+    // The app's own mark, pulled from the live build's asset bundle
+    // (assets/logoMyAtlascare.png, 1024²) rather than cropped off a screenshot.
+    avatar: `${import.meta.env.BASE_URL}myatlas-logo.png`,
+    scene: 'office',
+    // A high-fidelity prototype — all data in the app is mock, and the in-app
+    // call is a simulated UI. The text describes capabilities, not services.
+    bio: 'สุขภาพทั้งชีวิตของคุณ — และของคนที่คุณดูแล — อยู่ในแอปเดียว MyAtlas วัดได้ 9 ค่าตั้งแต่หัวใจ ความดัน น้ำตาล ไปจนถึงการนอน แสดงเป็นกราฟและ activity ring แบบเดียวกับแอปสุขภาพระดับ OS ตารางยารู้เองว่าเม็ดไหนกินเช้าหรือก่อนนอน ก่อนหรือหลังอาหาร ใบสั่งยาแยกตามโรงพยาบาลให้ค้นย้อนได้ ถ่ายรูปมื้ออาหารด้วย Food Lens แล้วแอปบันทึกให้ ดูแลพ่อแม่ทางไกลได้จากแท็บครอบครัว — เห็นค่าสุขภาพของกันและโทรหากันในแอปได้เลย ปิดท้ายด้วยเวชระเบียนส่วนตัวที่ล็อกด้วย PIN: แพ้ยา โรคประจำตัว วัคซีน ประกัน ครบ',
     stats: null,
-    techStack: [],
-    kind: '',
-    category: '',
-    prototypeUrl: null,
-    repoUrl: null,
-    tabs: [],
+    techStack: ['Flutter', 'Dart', 'Figma', 'GitHub'],
+    kind: 'Mobile app',
+    category: 'Health',
+    // The live Flutter web build, handed over by the owner.
+    prototypeUrl: 'https://oommiemie.github.io/myatlas_app/',
+    // Flutter web draws at the app's own design width (responsive.dart
+    // baseWidth 390).
+    appViewport: { w: 390, h: 844 },
+    repoUrl: 'https://github.com/oommiemie/myatlas_app',
+    tabs: [
+      {
+        id: 'overview',
+        label: 'Project Overview',
+        detail: 'feed',
+        cards: [
+          { id: 'role', label: 'บทบาทหน้าที่', color: '#21221f', art: 'report' },
+          { id: 'outcome', label: 'ผลการดำเนินงาน', color: '#33312c', art: 'report' },
+          { id: 'problems', label: 'ปัญหาที่พบ', color: '#46433c', art: 'report' },
+          { id: 'learned', label: 'สิ่งที่ได้เรียนรู้', color: '#5a5750', art: 'report' },
+        ],
+        report: {
+          title: 'รายงานสรุปผลงาน',
+          subtitle: 'MyAtlas · Health app',
+          // The planning window the printed portfolio (PDF) states.
+          period: '15 เมษายน – 10 มิถุนายน 2569',
+          entries: [
+            {
+              label: 'บทบาทหน้าที่',
+              headFields: false,
+              color: '#21221f',
+              stat: 'UX/UI',
+              statLabel: 'Role',
+              statNote: 'ดูแลสุขภาพผู้ใช้และครอบครัว — สัญญาณชีพ โภชนาการ และบันทึกทานยา',
+              lead: 'แอปสุขภาพสำหรับคนที่ใส่ใจสุขภาพของตัวเองหรือคนในครอบครัว — Re-design UI จากเวอร์ชั่นก่อนหน้า ตั้งแต่ Wireframe จนถึง Prototype โทนสีฟ้าเขียวให้ความรู้สึกสะอาด ปลอดภัย สุขภาพดี',
+              // The three duty cards, matching the printed portfolio (PDF).
+              items: [
+                {
+                  title: 'Get Requirement',
+                  desc: 'ประชุมร่วมกับเพื่อนร่วมทีม เพื่อสรุปวัตถุประสงค์และเป้าหมาย',
+                },
+                {
+                  title: 'UX/UI Re-Design',
+                  desc: 'นำ UI ในเวอร์ชั่นก่อนหน้านี้มาปรับแก้ UI โดยเริ่มทำตั้งแต่ Wireframe - Prototype',
+                },
+                {
+                  title: 'Vibe Coding',
+                  desc: 'นำ Hi-Wireframe จาก Figma พัฒนาต่อโดย Vibe Coding ออกมาเป็น Prototype',
+                },
+              ],
+              tools: ['Figma', 'Claude', 'VS Code', 'Xcode', 'GitHub'],
+            },
+            {
+              label: 'ผลการดำเนินงาน',
+              headFields: false,
+              color: '#21221f',
+              stat: 'Handoff',
+              statLabel: 'Status',
+              statNote: 'อยู่ในขั้นตอนพัฒนาของฝั่งนักพัฒนาโปรแกรม',
+              // Status per the printed portfolio (PDF ผลลัพธ์ page).
+              lead: 'สถานะ Handoff — กำลังอยู่ในขั้นตอนพัฒนาของทางฝั่งนักพัฒนาโปรแกรม',
+              items: [
+                {
+                  title: 'Design UX/UI , Vibe Coding',
+                  desc: 'ออกแบบ UX/UI , Vibe Coding ตาม Requirement',
+                },
+                {
+                  title: 'Test UX/UI',
+                  desc: 'ทดสอบการใช้งานบนเครื่องก่อน Handoff UI ต่อให้ทีมพัฒนา',
+                },
+                {
+                  title: 'Handoff',
+                  desc: 'ส่งต่อไฟล์และโค้ดผ่าน GitHub ให้ทีมพัฒนาต่อ',
+                },
+                {
+                  title: 'Feedback',
+                  desc: 'รับความเห็นจากทีมและ PM มาปรับแก้ไข UX/UI',
+                },
+              ],
+            },
+            {
+              label: 'ปัญหาที่พบ',
+              color: '#21221f',
+              headFields: false,
+              stat: '3 เรื่อง',
+              statLabel: 'Issues',
+              statNote: 'อุปสรรคที่เจอตอนทำ MyAtlas',
+              lead: 'อุปสรรคที่เจอระหว่างทาง และวิธีที่ใช้แก้จริงในงานนี้',
+              strip: true,
+              // Matching the printed portfolio (PDF ปัญหาที่พบ page).
+              items: [
+                {
+                  title: 'Timeline',
+                  desc: 'ขอบเขตในการทำงานเร่งด่วน',
+                  fix: 'วางแผนแนวทางการดำเนินงาน แบ่งสัดส่วนหน้าที่กับเพื่อนร่วมทีมให้งานถูกแบ่งอย่างชัดเจน และช่วยเหลือซึ่งกันและกันในทุกด้าน เพื่อให้งานสำเร็จตามเวลา',
+                },
+                {
+                  title: 'Objective & Goal',
+                  desc: 'ขอบเขตไม่ชัด มีเพิ่มลดสเปคทีหลัง',
+                  fix: 'MyAtlas จัดประชุมทีมภายในแต่ละสัปดาห์เพื่ออัปเดตความคืบหน้าในการทำงาน ได้รับฟีดแบคกลับมาให้ปรับแก้ UI ตามความต้องการ',
+                },
+                {
+                  title: 'Tool',
+                  desc: 'Token บางครั้งไม่พอใช้งาน',
+                  fix: 'Prompt ให้ครอบคลุมและทำทีละหน้าจอ เก็บส่วนที่ใช้ซ้ำเป็น Component ตั้งแต่ต้น จึงไม่ต้องทำ UI ที่มันซ้ำกันอีกรอบ และลง skill ที่ทำให้ประหยัด Token',
+                },
+              ],
+            },
+            {
+              label: 'สิ่งที่ได้เรียนรู้',
+              headFields: false,
+              color: '#21221f',
+              stat: '4 เรื่อง',
+              statLabel: 'Takeaways',
+              statNote: 'ทักษะที่ติดตัวออกมาจากงานนี้',
+              lead: 'สี่อย่างที่ใช้ต่อได้ในงานหลังจากนี้ — เครื่องมือแปลงดีไซน์ กระบวนการส่งมอบ การใช้ AI และการทำดีไซน์ให้เป็นระบบ',
+              // Matching the printed portfolio (PDF สิ่งที่เรียนรู้เพิ่มเติม page).
+              items: [
+                {
+                  title: 'Vibe Coding',
+                  desc: 'เรียนรู้การใช้งานเพื่อแปลงดีไซน์จาก Figma ให้กลายเป็น Interactive Prototype ที่ใช้งานได้ พร้อมพัฒนาต่อ',
+                },
+                {
+                  title: 'Design to Dev',
+                  desc: 'เรียนรู้กระบวนการ Design Specs และ Component ให้เป็นระบบ พร้อมสำหรับการ Handoff และการใช้เครื่องมือ GitHub',
+                },
+                {
+                  title: 'Skill AI',
+                  desc: 'เรียนรู้การใช้ AI เป็นเครื่องมือให้ประหยัดหรือตรงต่อความต้องการ เช่น ใส่ Skill ให้ AI ตรงตามสเปคที่เราต้องการ',
+                },
+                {
+                  title: 'Design System',
+                  desc: 'เรียนรู้การ Design Specs และ Component ให้เป็นระบบ เพื่อนำไปใช้และพัฒนาต่อได้ง่าย',
+                },
+              ],
+            },
+          ],
+        },
+        blocks: [
+          { type: 'heading', text: 'MyAtlas' },
+          {
+            type: 'paragraph',
+            text: 'A personal health companion: vitals, medication schedule, family care and a PIN-locked medical profile — in one Flutter app.',
+          },
+        ],
+      },
+      {
+        id: 'design-system',
+        label: 'Design System',
+        cardColor: '#1D8B6B',
+        detail: 'feed',
+        detailStart: 'Color',
+        // Every block below is authored in src/data/myatlasDesign.js — read
+        // from the Flutter source (myatlas_app/lib/core/theme) and measured
+        // off the live build's captures. See that file for the citations.
+        cards: [
+          {
+            id: 'component',
+            label: 'Component',
+            color: '#21221f',
+            pills: ['LiquidGlassButton', 'GlassCard', 'MetricCard', 'ActivityRing', 'CustomTabBar', 'MiniCallOverlay'],
+          },
+          { id: 'typography', label: 'Typography', color: '#33312c', art: 'typeface' },
+          { id: 'color', label: 'Color', color: '#1D8B6B' },
+          { id: 'grid', label: 'Grid & Layout', color: '#5a5750', art: 'inspect' },
+          { id: 'lowfi', label: 'Low-fi', color: '#46433c', art: 'wire' },
+          { id: 'hifi', label: 'Hi-fi', color: '#177a5b', art: 'shot' },
+        ],
+        component: myatlasComponent,
+        typography: myatlasTypography,
+        color: myatlasColor,
+        grid: myatlasGrid,
+        wireframe: myatlasWireframe,
+        hifi: myatlasHifi,
+        blocks: [],
+      },
+    ],
   },
 ]
 

@@ -51,14 +51,19 @@ export default function VerticalFeed() {
       avatar: p.avatar,
       initial: p.title?.[0],
       // Which device the project's front page shows it on: Pawmely is a phone
-      // app, Metaherb is a web app, so it gets the laptop.
+      // app, Metaherb is a web app, so it gets the laptop. A project may force
+      // its own `scene` (MyAtlas stages the phone before its prototype link
+      // exists — the model stands with the cover art, no play button yet).
       scene:
-        p.id === 'metaherb'
+        p.scene ??
+        (p.id === 'metaherb'
           ? 'desk' // a web app, shown on the laptop
           : p.prototypeUrl
             ? 'office' // a phone app, shown on the iPhone
-            : undefined,
+            : undefined),
       prototypeUrl: p.prototypeUrl,
+      // The canvas the app draws at, when it differs from the device default.
+      appViewport: p.appViewport,
       // The still the device wears until the live build has booted — each
       // project's own, not one shared file.
       cover: p.cover,
@@ -324,12 +329,12 @@ export default function VerticalFeed() {
     // The fence proper: a scroll that would leave the stage never starts, so
     // there is nothing to snap back and nothing to judder.
     //
-    // Inside the project stage NOTHING scrolls at all. The projects are pages
-    // now, reached by their names in the list — scrolling between them showed
-    // every project in between, which reads as travelling past three to get to
-    // the fourth. The arc wipe is the only way one becomes another.
+    // Inside a stage the wheel scrolls freely — the project stage included:
+    // one project snaps to the next, and the index row's ink follows the
+    // position the scroll reports (see onScroll). Picking a name from that row
+    // still plays the arc wipe, which is what keeps a jump of three projects
+    // from showing the two in between.
     const blocked = (dir) => {
-      if (stageRef.current === 'project') return true
       const [min, max] = range()
       const t = wrapper.scrollTop
       return (dir < 0 && t <= min + 1) || (dir > 0 && t >= max - 1)
@@ -607,7 +612,7 @@ export default function VerticalFeed() {
               scene={s.scene}
               lanyard={s.domId === 'sec-hero'}
               bare={s.bare}
-              info={s.scene ? { tagline: s.lines?.[0], bio: s.lines?.[1], prototypeUrl: s.prototypeUrl, title: s.title, cover: s.cover } : undefined}
+              info={s.scene ? { tagline: s.lines?.[0], bio: s.lines?.[1], prototypeUrl: s.prototypeUrl, title: s.title, cover: s.cover, appViewport: s.appViewport } : undefined}
               // Every section's copy, for the phone's bottom caption band. The
               // scene section renders its own (it also has a desktop column);
               // the rest had no copy on screen at all, which left Contact's

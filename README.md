@@ -30,6 +30,30 @@ npm run deploy   # build + publish dist/ to gh-pages branch
 
 > ทุกครั้งที่อัปเดต/push ให้บันทึกรายละเอียดการแก้ไขไว้ที่นี่ (ใหม่สุดอยู่บน).
 
+### 2026-09-03 — 5 โปรเจคครบเท่ากัน, live component kit ต่อโปรเจค, scroll กลับมา
+
+**Metaherb Cafe + MyAtlas เต็มรูปแบบ** — จากชื่อเปล่ากลายเป็นหน้าโปรเจคเท่าโปรเจคอื่นทุกหัวข้อ:
+- **Metaherb Cafe**: ใช้บิลด์เดียวกับ Metaherb Mobile (คาเฟ่อยู่ในแอปนั้น) เปิด prototype ตรง
+  หน้าคาเฟ่ผ่าน `?screen=Cafe`, cover + Hi-fi 4 จอจับจากบิลด์จริง (`scripts/capture-cafe*.mjs`)
+- **MyAtlas**: โมเดลมือถือ + prototype จากบิลด์ Flutter จริง, โลโก้ MYATLASCARE จาก asset bundle
+  ของแอป, Hi-fi 4 แท็บจับจากเว็บ live (`scripts/capture-myatlas*.mjs`)
+- ทั้งคู่มี Design System ครบ 6 การ์ด (Component / Typography / Color / Grid / Low-fi / Hi-fi)
+  เหมือนโปรเจคอื่น — Mobile กับ Cafe แชร์ระบบเดียวกันผ่าน `MM_SYSTEM` เพราะอยู่รีโปเดียวกัน
+
+**Live component kit แยกต่อโปรเจค** — เดิมทุกโปรเจค mount `PawmelyKit` ชุดเดียวกันหมด ตอนนี้
+แต่ละแอปมี kit ของตัวเอง rebuild เป็น React กดเล่นได้จริง จาก token/โค้ด/จอจริงของแอปนั้น:
+`MetaherbKit.jsx` (7 ตัว) · `MMKit.jsx` (10 ตัว ใช้ร่วม Mobile+Cafe) · `MyAtlasKit.jsx` (7 ตัว)
+พร้อมข้อมูล specimen แยกไฟล์ `metaherbDesign.js` / `mobileCafeWireframes.js` / `myatlasDesign.js`
+— ทุกค่าวัดจากบิลด์จริงหรืออ่านจากซอร์ส อ้างที่มาไว้ในไฟล์
+
+**เนื้อหาตาม portfolio ฉบับพิมพ์ (PDF)** — บทบาทหน้าที่ / ผลการดำเนินงาน / ปัญหาที่พบ /
+สิ่งที่ได้เรียนรู้ ของทั้ง 5 โปรเจคเขียนใหม่ให้ตรงเอกสาร, bio ทุกโปรเจคเขียนใหม่แนวชูความสามารถ,
+ตัดตารางแผนงาน (timeline) และการ์ดตัวเลขที่ไม่ตรงออก
+
+**Interaction** — scroll เปลี่ยนโปรเจคได้เหมือนเดิม (ink แถวล่างเลื่อนตาม, รั้วกันหลุด stage ยังอยู่),
+ปิด prototype อัตโนมัติเมื่อออกจากหน้า, ปุ่มย้อนกลับหน้ารายละเอียดตรงกับหน้าโปรไฟล์ (32/37),
+iframe prototype ใช้ `appViewport` ต่อโปรเจค (430×932 สำหรับ Metaherb Mobile/Cafe) จอไม่โดนตัดขอบ
+
 ### 2026-08-27 — Project stage แบบ hirotos, arc-wipe transition, action row ในคอลัมน์เนื้อหา
 
 **Project stage rework (อ้างอิง hirotos.com)** — หน้าโปรเจคเลิกเป็น scroll กลายเป็น "เพจ":
